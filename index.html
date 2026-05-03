@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MFH-Wirtschaftlichkeitsrechner</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ============================================================
+   CSS VARIABLEN & RESET
+   ============================================================ */
+:root {
+  --akzent:       #2563eb;
+  --akzent-hell:  #dbeafe;
+  --akzent-dunkel:#1d4ed8;
+  --bg:           #f1f5f9;
+  --karte:        #ffffff;
+  --sidebar-bg:   #ffffff;
+  --text:         #1e293b;
+  --text-leicht:  #64748b;
+  --rand:         #e2e8f0;
+  --rand-dunkel:  #cbd5e1;
+  --rot:          #dc2626;
+  --rot-hell:     #fee2e2;
+  --gelb:         #d97706;
+  --gelb-hell:    #fef3c7;
+  --gruen:        #16a34a;
+  --gruen-hell:   #dcfce7;
+  --sidebar-w:    400px;
+  --header-h:     80px;
+  --radius:       8px;
+  --radius-sm:    5px;
+  --schatten:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --schatten-md:  0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+  --transition:   all .15s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13.5px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--karte);
+  border-bottom: 1px solid var(--rand);
+  box-shadow: var(--schatten);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  gap: 12px;
+}
+
+.header-title h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.3px;
+}
+
+.header-title p {
+  font-size: 12px;
+  color: var(--text-leicht);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.disclaimer {
+  background: #fffbeb;
+  border-top: 1px solid #fde68a;
+  padding: 6px 20px;
+  font-size: 11.5px;
+  color: #92400e;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--akzent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--akzent-dunkel); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--rand-dunkel);
+}
+.btn-outline:hover { background: var(--bg); border-color: var(--akzent); color: var(--akzent); }
+
+.btn-danger { background: var(--rot); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+
+.btn-sm { padding: 3px 8px; font-size: 11.5px; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: calc(100vh - var(--header-h));
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--rand);
+  overflow-y: auto;
+  height: calc(100vh - var(--header-h));
+  position: sticky;
+  top: var(--header-h);
+}
+
+.section-block {
+  border-bottom: 1px solid var(--rand);
+}
+
+.section-block summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--text);
+  letter-spacing: .1px;
+  list-style: none;
+  background: #f8fafc;
+}
+
+.section-block summary::-webkit-details-marker { display: none; }
+
+.section-block summary::after {
+  content: '▾';
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-leicht);
+  transition: transform .2s;
+}
+
+.section-block[open] summary::after { transform: rotate(180deg); }
+.section-block summary:hover { background: var(--akzent-hell); }
+.section-block[open] summary { color: var(--akzent); }
+
+.section-icon { font-size: 14px; }
+
+.section-body {
+  padding: 12px 16px 16px;
+}
+
+/* ============================================================
+   INPUT GRUPPEN
+   ============================================================ */
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--text-leicht);
+  font-weight: 500;
+}
+
+.input-pair {
+  display: grid;
+  grid-template-columns: 1fr 90px;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-pair-unit {
+  display: grid;
+  grid-template-columns: 1fr 72px 32px;
+  gap: 6px;
+  align-items: center;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rand-dunkel);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--akzent);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--akzent);
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--rand-dunkel);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  color: var(--text);
+  background: white;
+  transition: border-color .15s;
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--akzent);
+  box-shadow: 0 0 0 3px var(--akzent-hell);
+}
+
+.unit-label {
+  font-size: 11.5px;
+  color: var(--text-leicht);
+  text-align: center;
+}
+
+select {
+  cursor: pointer;
+}
+
+/* Toggle / Checkbox */
+.toggle-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.toggle-label-text {
+  font-size: 12px;
+  color: var(--text-leicht);
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--rand-dunkel);
+  border-radius: 20px;
+  transition: var(--transition);
+}
+
+.toggle-slider::before {
+  position: absolute;
+  content: '';
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.toggle input:checked + .toggle-slider { background: var(--akzent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* ============================================================
+   EINHEITEN TABELLE
+   ============================================================ */
+.einheiten-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.einheiten-table th {
+  text-align: left;
+  padding: 4px 6px;
+  background: var(--bg);
+  color: var(--text-leicht);
+  font-weight: 600;
+  font-size: 11px;
+  border-bottom: 1px solid var(--rand);
+}
+
+.einheiten-table td {
+  padding: 3px 4px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.einheiten-table input[type="number"] {
+  padding: 3px 5px;
+  font-size: 12px;
+  width: 100%;
+}
+
+.einheiten-table input[type="text"] {
+  padding: 3px 5px;
+  font-size: 12px;
+  width: 100%;
+}
+
+/* Tooltip */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--rand-dunkel);
+  color: var(--text-leicht);
+  font-size: 9px;
+  cursor: help;
+  font-style: normal;
+  position: relative;
+}
+
+.info-icon::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1e293b;
+  color: white;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  white-space: pre-wrap;
+  max-width: 260px;
+  width: max-content;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+  z-index: 200;
+  line-height: 1.5;
+}
+
+.info-icon:hover::after { opacity: 1; }
+
+/* ============================================================
+   HAUPT-CONTENT
+   ============================================================ */
+.content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.content-section {
+  margin-bottom: 24px;
+}
+
+.content-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-leicht);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rand);
+}
+
+/* ============================================================
+   KPI KARTEN
+   ============================================================ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  background: var(--karte);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--schatten);
+  border-left: 4px solid var(--rand-dunkel);
+  transition: var(--transition);
+}
+
+.kpi-card.gruen  { border-left-color: var(--gruen); }
+.kpi-card.gelb   { border-left-color: var(--gelb); }
+.kpi-card.rot    { border-left-color: var(--rot); }
+.kpi-card.blau   { border-left-color: var(--akzent); }
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-leicht);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 5px;
+}
+
+.kpi-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'SF Mono', 'Consolas', monospace;
+  letter-spacing: -.5px;
+}
+
+.kpi-card.gruen .kpi-value { color: var(--gruen); }
+.kpi-card.gelb  .kpi-value { color: var(--gelb); }
+.kpi-card.rot   .kpi-value { color: var(--rot); }
+.kpi-card.blau  .kpi-value { color: var(--akzent); }
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--text-leicht);
+  margin-top: 3px;
+}
+
+/* ============================================================
+   FINANZIERUNGS-LÜCKE
+   ============================================================ */
+.fin-gap-banner {
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fin-gap-ok   { background: var(--gruen-hell); color: #14532d; border: 1px solid #86efac; }
+.fin-gap-warn { background: var(--gelb-hell);  color: #78350f; border: 1px solid #fde68a; }
+.fin-gap-err  { background: var(--rot-hell);   color: #7f1d1d; border: 1px solid #fca5a5; }
+
+/* ============================================================
+   CHART KARTEN
+   ============================================================ */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.chart-card {
+  background: var(--karte);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.chart-card--full {
+  grid-column: 1 / -1;
+}
+
+.chart-card h3 {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-leicht);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.chart-card canvas {
+  max-height: 280px;
+}
+
+.chart-card--full canvas {
+  max-height: 220px;
+}
+
+.waterfall-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.waterfall-controls input[type="range"] {
+  width: 200px;
+}
+
+/* ============================================================
+   SZENARIEN
+   ============================================================ */
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.scenario-card {
+  background: var(--karte);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 14px;
+  border: 2px solid var(--rand);
+}
+
+.scenario-card.active { border-color: var(--akzent); }
+
+.scenario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.scenario-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.scenario-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.scenario-kpi {
+  font-size: 11.5px;
+}
+
+.scenario-kpi-label { color: var(--text-leicht); }
+
+.scenario-kpi-value {
+  font-family: 'SF Mono', monospace;
+  font-weight: 600;
+}
+
+.hint {
+  color: var(--text-leicht);
+  font-size: 12.5px;
+  font-style: italic;
+  padding: 12px;
+  background: var(--karte);
+  border-radius: var(--radius);
+  border: 1px dashed var(--rand-dunkel);
+}
+
+/* ============================================================
+   JAHRESTABELLE (Tilgungsplan)
+   ============================================================ */
+.plan-table-wrapper {
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--rand);
+}
+
+.plan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.plan-table th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  padding: 6px 10px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-leicht);
+  border-bottom: 1px solid var(--rand);
+  white-space: nowrap;
+}
+
+.plan-table th:first-child { text-align: center; }
+
+.plan-table td {
+  padding: 4px 10px;
+  text-align: right;
+  border-bottom: 1px solid #f8fafc;
+  font-family: 'SF Mono', monospace;
+  white-space: nowrap;
+}
+
+.plan-table td:first-child { text-align: center; font-weight: 600; }
+
+.plan-table tr:hover td { background: var(--akzent-hell); }
+.plan-table tr.saniert td { background: #f0fdf4; }
+.plan-table tr.saniert td:first-child::after { content: ' ✓'; color: var(--gruen); }
+
+.val-pos { color: var(--gruen); }
+.val-neg { color: var(--rot); }
+
+/* ============================================================
+   SANIERUNGSKLASSIFIZIERUNG
+   ============================================================ */
+.san-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.san-split-item label {
+  font-size: 10.5px;
+  color: var(--text-leicht);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.san-split-warning {
+  font-size: 11px;
+  color: var(--rot);
+  margin-top: 4px;
+}
+
+/* ============================================================
+   RESPONSIV
+   ============================================================ */
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--rand);
+  }
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .scenarios-grid {
+    grid-template-columns: 1fr;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .header-actions { display: none; }
+}
+
+/* ============================================================
+   DRUCKANSICHT (CSS @media print)
+   ============================================================ */
+@media print {
+  .sidebar, .header-actions, .waterfall-controls input { display: none !important; }
+  .app-layout { grid-template-columns: 1fr; }
+  .content { padding: 0; }
+  body { font-size: 12px; background: white; }
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+  .charts-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-card { box-shadow: none; border: 1px solid var(--rand); }
+  .app-header { position: static; box-shadow: none; }
+  .chart-card canvas { max-height: 200px !important; }
+  @page { margin: 15mm; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="app-header">
+  <div class="header-top">
+    <div class="header-title">
+      <h1>MFH-Wirtschaftlichkeitsrechner</h1>
+      <p>Mehrfamilienhaus · Havixbeck/Münsterland · Baujahr 1970 · Sanierungsstau</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline btn-sm" onclick="resetDefaults()">↺ Reset</button>
+      <button class="btn btn-outline btn-sm" onclick="exportJSON()">⬇ JSON</button>
+      <button class="btn btn-outline btn-sm" onclick="window.print()">Drucken</button>
+      <button class="btn btn-primary btn-sm" onclick="saveScenario()">📌 Szenario merken</button>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <strong>⚠ Hinweis:</strong> Dieses Tool dient der Orientierung und ersetzt weder Steuerberatung noch ein Bausachverständigen-Gutachten.
+    Förderkonditionen ändern sich – bitte aktuelle BEG-Richtlinien und KfW-Konditionen prüfen. Stand: 2024.
+  </div>
+</header>
+
+<!-- ============================================================
+     APP-LAYOUT
+     ============================================================ -->
+<div class="app-layout">
+
+  <!-- SIDEBAR (Eingaben – durch JS befüllt) -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- HAUPT-CONTENT -->
+  <main class="content">
+
+    <!-- Kennzahlen-Dashboard -->
+    <div class="content-section">
+      <div class="content-section-title">Kennzahlen-Dashboard</div>
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div id="fin-gap-container"></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="content-section">
+      <div class="content-section-title">Analyse &amp; Visualisierung</div>
+      <div class="charts-grid">
+
+        <div class="chart-card">
+          <h3>Cashflow-Verlauf · 30 Jahre</h3>
+          <canvas id="chart-cashflow" height="240"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h3>Tilgungsverlauf · Restschuld</h3>
+          <canvas id="chart-tilgung" height="240"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h3>Finanzierungsstruktur</h3>
+          <canvas id="chart-finanzierung" height="240"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h3>Sanierungskosten-Aufschlüsselung</h3>
+          <canvas id="chart-sanierung" height="240"></canvas>
+        </div>
+
+        <div class="chart-card chart-card--full">
+          <div class="waterfall-controls">
+            <h3 style="margin:0">Cashflow-Wasserfall · Jahr <span id="wf-year-label">1</span></h3>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--text-leicht)">Jahr:</span>
+              <input type="range" id="wf-year-slider" min="1" max="30" value="1">
+              <span style="font-size:11px;color:var(--text-leicht);width:20px" id="wf-year-val">1</span>
+            </div>
+          </div>
+          <canvas id="chart-wasserfall" height="160"></canvas>
+        </div>
+
+        <div class="chart-card chart-card--full">
+          <h3>Sensitivitätsanalyse · 10-J.-Kumulativ-Cashflow (nach Steuern)</h3>
+          <canvas id="chart-sensitivitaet" height="200"></canvas>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Jahrestabelle -->
+    <div class="content-section">
+      <div class="content-section-title">30-Jahres-Cashflow-Plan</div>
+      <div class="plan-table-wrapper">
+        <table class="plan-table" id="plan-table">
+          <thead>
+            <tr>
+              <th>J.</th>
+              <th>Brutto-Miete</th>
+              <th>Netto-Mietertrag</th>
+              <th>Zinsen</th>
+              <th>Tilgung</th>
+              <th>CF v.St.</th>
+              <th>Steuereffekt</th>
+              <th>CF n.St.</th>
+              <th>Kumulativ CF</th>
+              <th>Restschuld</th>
+            </tr>
+          </thead>
+          <tbody id="plan-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Szenarien-Vergleich -->
+    <div class="content-section">
+      <div class="content-section-title">Szenarien-Vergleich</div>
+      <div id="scenarios-area">
+        <p class="hint">Klicken Sie auf „📌 Szenario merken" (oben rechts), um die aktuellen Eingaben zu speichern. Bis zu 3 Szenarien können verglichen werden.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+'use strict';
+
+/* ============================================================
+   HILFSFUNKTIONEN
+   ============================================================ */
+
+/** Tiefe Kopie eines Objekts */
+function tiefKopie(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+/** Deutschen Zahlformat */
+const fmt = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 });
+const fmtDez = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const fmtDez2 = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function eur(n) { return fmt.format(n) + ' €'; }
+function pct(n) { return fmtDez.format(n) + ' %'; }
+
+function farbklasse(val, gruen, gelb) {
+  if (val >= gruen) return 'gruen';
+  if (val >= gelb)  return 'gelb';
+  return 'rot';
+}
+
+
+/* ============================================================
+   STANDARD-WERTE (Havixbeck-Objekt)
+   ============================================================ */
+const DEFAULTS = {
+  /* Kaufobjekt */
+  kaufpreis:              280000,
+  grundstuecksanteil_pct: 60,      /* 671m² × 260 €/m² ≈ 174k / 280k */
+  gesamtflaeche:          350,
+  eigennutzungsanteil_pct:24,      /* 85m² / 350m² ≈ 24 % */
+  nk_gre:                 6.5,     /* Grunderwerbsteuer NRW §1 GrEStG */
+  nk_notar:               1.5,     /* Notar + Grundbuch */
+  nk_makler:              0,
+
+  /* Einheiten */
+  einheiten: [
+    { id:1, typ:'gewerbe', name:'Gewerbe EG',    flaeche:100, kaltmiete:1000, eigennutzung:false },
+    { id:2, typ:'wohnung', name:'WE 1 (EG)',     flaeche:85,  kaltmiete:625,  eigennutzung:true  },
+    { id:3, typ:'wohnung', name:'WE 2 (1.OG l)', flaeche:35,  kaltmiete:200,  eigennutzung:false },
+    { id:4, typ:'wohnung', name:'WE 3 (1.OG r)', flaeche:45,  kaltmiete:300,  eigennutzung:false },
+    { id:5, typ:'wohnung', name:'WE 4 (2.OG)',   flaeche:85,  kaltmiete:590,  eigennutzung:false },
+  ],
+  mietpotenzial_pro_m2:   9.50,    /* €/m² Kaltmiete nach Sanierung */
+  mietausfallwagnis_pct:  4,
+  mietsteigerung_pct:     1.5,
+  sanierungsjahr:         2,       /* Sanierung abgeschlossen Ende Jahr 2 */
+
+  /* Sanierungskosten */
+  san_dach:               40000,
+  san_fenster:            25000,
+  san_heizung:            25000,
+  san_heizung_typ:        'waermepumpe',
+  san_elektrik:           20000,   /* DIN VDE 0100 */
+  san_fassade:            30000,
+  san_baeder:             20000,
+  san_sonstiges:          15000,   /* Asbest, Statik, Steigleitungen */
+  san_eigenleistung_pct:  10,
+  /* Klassifizierung §6 Abs. 1 Nr. 1a EStG / §255 HGB */
+  san_hk_pct:             40,      /* Herstellungskosten → AfA */
+  san_ea_pct:             40,      /* Erhaltungsaufwand → §82b EStDV Verteilung 5 J. */
+  san_anak_pct:           20,      /* Anschaffungsnaher Aufwand → wie HK, AfA */
+
+  /* Förderung (KfW BEG / BAFA) */
+  effizienzhaus:          'eh70ee',
+  isfp_bonus:             false,   /* iSFP-Bonus +5 % §10 BEG-Richtlinie */
+  bafa_heizung:           true,
+  foerderfaehige_kosten:  120000,  /* energetisch förderfähige Kostenbasis */
+
+  /* Finanzierung */
+  vd_hoehe:               180000,  /* Verkäuferdarlehen (Tante, zinslos) */
+  vd_tilgung_monatlich:   600,
+  vd_zinssatz:            0,
+  bank_kauf_hoehe:        30000,
+  bank_kauf_zinssatz:     3.5,
+  bank_kauf_tilgung_pct:  2.0,
+  bank_kauf_zinsbindung:  10,
+  bank_san_hoehe:         40000,
+  bank_san_zinssatz:      3.8,
+  bank_san_tilgung_pct:   2.0,
+  bank_san_zinsbindung:   15,
+  kfw_hoehe:              100000,  /* KfW 261 – max. 150k/WE */
+  kfw_zinssatz:           2.1,
+  kfw_laufzeit:           20,
+  eigenkapital:           50000,
+
+  /* Steuern & Bewirtschaftung */
+  grenzsteuersatz_pct:    38,
+  bewirtschaftungskosten_pct: 15,
+  instandhaltung_pro_m2:  8,       /* €/m²/Jahr nach Sanierung */
+  afa_satz_pct:           2.0,     /* §7 Abs. 4 EStG – 2 % linear Bj. >1924 */
+};
+
+/* ============================================================
+   KfW / BAFA LOOKUP-TABELLEN  (Stand BEG 2024)
+   ============================================================ */
+const KFW_ZUSCHUSS = {
+  bestand: 0,
+  eh85:    5,
+  eh70ee: 10,
+  eh55ee: 15,
+  eh40ee: 20,
+};
+
+/* BAFA Basis-Förderquoten (vereinfacht):
+   Wärmepumpe: 30 % Grundförderung + 20 % Klimabonus (Ersatz fossil) = 50 %
+   Pellet: 30 % Grundförderung + 5 % Effizienz-Bonus = 35 %
+   Gas-Hybrid: seit 01.01.2024 nicht mehr BAFA-förderfähig */
+const BAFA_RATE = {
+  waermepumpe: 0.50,
+  pellet:      0.35,
+  gas_hybrid:  0.00,
+};
+
+/* ============================================================
+   BERECHNUNGSLOGIK (CALC-Namespace – reine Funktionen)
+   Referenzen: EStG §7,§9,§21; GEG 2023; BEG-Richtlinie 2024
+   ============================================================ */
+const CALC = {
+
+  /* --- Kaufnebenkosten gesamt --------------------------------------- */
+  kaufnebenkosten(s) {
+    return s.kaufpreis * (s.nk_gre + s.nk_notar + s.nk_makler) / 100;
+  },
+
+  /* --- Gebäude-Anschaffungskosten (AfA-Basis) §7 Abs. 4 EStG ------- */
+  gebaeudeAK(s) {
+    const nk      = this.kaufnebenkosten(s);
+    const gFaktor = 1 - s.grundstuecksanteil_pct / 100;
+    return s.kaufpreis * gFaktor + nk * gFaktor;
+  },
+
+  /* --- Sanierungskosten brutto (alle Gewerke) ----------------------- */
+  sanBrutto(s) {
+    return s.san_dach + s.san_fenster + s.san_heizung +
+           s.san_elektrik + s.san_fassade + s.san_baeder + s.san_sonstiges;
+  },
+
+  /* --- Sanierungskosten nach Eigenleistungsabzug (Cashflow-relevant) */
+  sanNetto(s) {
+    return this.sanBrutto(s) * (1 - s.san_eigenleistung_pct / 100);
+  },
+
+  /* --- KfW BEG Tilgungszuschuss (%) -------------------------------- */
+  kfwTilgungszuschuss(s) {
+    const basis = KFW_ZUSCHUSS[s.effizienzhaus] ?? 0;
+    return basis + (s.isfp_bonus ? 5 : 0);
+  },
+
+  /* --- BAFA-Zuschuss (absolut €) ------------------------------------ */
+  bafaZuschuss(s) {
+    if (!s.bafa_heizung) return 0;
+    const rate = BAFA_RATE[s.san_heizung_typ] ?? 0;
+    /* Förderung nur auf Heizungskosten, max 30.000 € pro WE */
+    const anzWE = s.einheiten.filter(e => e.typ === 'wohnung').length;
+    return Math.min(s.san_heizung * rate, anzWE * 30000);
+  },
+
+  /* --- KfW-Zuschuss in € ------------------------------------------- */
+  kfwZuschuss(s) {
+    return s.kfw_hoehe * this.kfwTilgungszuschuss(s) / 100;
+  },
+
+  /* --- Gesamtförderung --------------------------------------------- */
+  foerderungGesamt(s) {
+    return this.kfwZuschuss(s) + this.bafaZuschuss(s);
+  },
+
+  /* --- Gesamtkapitalbedarf ----------------------------------------- */
+  gesamtbedarf(s) {
+    return s.kaufpreis + this.kaufnebenkosten(s) + this.sanNetto(s);
+  },
+
+  /* --- Gesamtfinanzierung (alle Darlehen + EK) --------------------- */
+  gesamtfinanzierung(s) {
+    const kfwEff = s.kfw_hoehe * (1 - this.kfwTilgungszuschuss(s) / 100);
+    return s.vd_hoehe + s.bank_kauf_hoehe + s.bank_san_hoehe + kfwEff + s.eigenkapital
+           + this.bafaZuschuss(s);
+  },
+
+  /* --- Finanzierungslücke (positiv = Überdeckung) ------------------- */
+  finanzierungssaldo(s) {
+    return this.gesamtfinanzierung(s) - this.gesamtbedarf(s);
+  },
+
+  /* --- Amortisierungsplan für Annuitätendarlehen -------------------- */
+  amortisierung(principal, zinssatz_pa, tilgung_pct_pa, jahre) {
+    const plan = [];
+    if (principal <= 0) {
+      for (let t = 1; t <= jahre; t++)
+        plan.push({ t, zinsen:0, tilgung:0, restschuld:0, annuitaet:0 });
+      return plan;
+    }
+    let restschuld = principal;
+    if (zinssatz_pa <= 0) {
+      /* Zinslos: lineare Tilgung */
+      const jahrestilgung = principal * tilgung_pct_pa / 100;
+      for (let t = 1; t <= jahre; t++) {
+        const til = Math.min(jahrestilgung, restschuld);
+        restschuld = Math.max(0, restschuld - til);
+        plan.push({ t, zinsen:0, tilgung:til, restschuld, annuitaet:til });
+      }
+    } else {
+      /* Annuität: anfängliche Tilgung + Zinsen = konstante Zahlung */
+      const annuitaet = principal * (zinssatz_pa / 100 + tilgung_pct_pa / 100);
+      for (let t = 1; t <= jahre; t++) {
+        if (restschuld <= 0.01) {
+          plan.push({ t, zinsen:0, tilgung:0, restschuld:0, annuitaet:0 }); continue;
+        }
+        const zinsen = restschuld * zinssatz_pa / 100;
+        const til    = Math.min(Math.max(annuitaet - zinsen, 0), restschuld);
+        restschuld   = Math.max(0, restschuld - til);
+        plan.push({ t, zinsen, tilgung:til, restschuld, annuitaet: zinsen + til });
+      }
+    }
+    return plan;
+  },
+
+  /* --- Verkäuferdarlehen-Plan (Festrate €/Monat) -------------------- */
+  vdAmortisierung(s, jahre) {
+    const plan = [];
+    let restschuld = s.vd_hoehe;
+    const jahresrate = s.vd_tilgung_monatlich * 12;
+    for (let t = 1; t <= jahre; t++) {
+      if (restschuld <= 0.01) {
+        plan.push({ t, zinsen:0, tilgung:0, restschuld:0, annuitaet:0 }); continue;
+      }
+      const zinsen  = restschuld * s.vd_zinssatz / 100;
+      const rohtil  = jahresrate - zinsen;
+      const tilgung = Math.min(Math.max(rohtil, 0), restschuld);
+      restschuld    = Math.max(0, restschuld - tilgung);
+      plan.push({ t, zinsen, tilgung, restschuld, annuitaet: zinsen + tilgung });
+    }
+    return plan;
+  },
+
+  /* --- Alle Darlehenspläne kombiniert ------------------------------ */
+  alleDarlehenPlaene(s, jahre = 30) {
+    const kfwEff = s.kfw_hoehe * (1 - this.kfwTilgungszuschuss(s) / 100);
+    return {
+      vd:      this.vdAmortisierung(s, jahre),
+      bankKauf:this.amortisierung(s.bank_kauf_hoehe, s.bank_kauf_zinssatz, s.bank_kauf_tilgung_pct, jahre),
+      bankSan: this.amortisierung(s.bank_san_hoehe,  s.bank_san_zinssatz,  s.bank_san_tilgung_pct,  jahre),
+      kfw:     this.amortisierung(kfwEff, s.kfw_zinssatz, 100 / s.kfw_laufzeit, jahre),
+    };
+  },
+
+  /* --- Kombinierter Schuldendienst für Jahr t (1-basiert) ---------- */
+  schuldendienst(plaene, t) {
+    let zinsen = 0, tilgung = 0, restschuld = 0;
+    for (const key of ['vd','bankKauf','bankSan','kfw']) {
+      const p = plaene[key][t - 1] ?? { zinsen:0, tilgung:0, restschuld:0 };
+      zinsen    += p.zinsen;
+      tilgung   += p.tilgung;
+      restschuld+= p.restschuld;
+    }
+    return { zinsen, tilgung, restschuld, gesamt: zinsen + tilgung };
+  },
+
+  /* --- Jahres-Cashflow (Kernfunktion) ------------------------------ */
+  jahresCashflow(s, plaene, t) {
+    const isSaniert = t > s.sanierungsjahr;
+    const vermEinh  = s.einheiten.filter(e => !e.eigennutzung);
+    const eigEinheit= s.einheiten.find(e => e.eigennutzung);
+
+    /* 1. Brutto-Mieteinnahmen */
+    let bruttoMiete = 0;
+    for (const e of vermEinh) {
+      if (isSaniert) {
+        /* Nach Sanierung: Marktmiete, Steigerung ab Sanierungsabschluss */
+        bruttoMiete += e.flaeche * s.mietpotenzial_pro_m2 * 12
+          * Math.pow(1 + s.mietsteigerung_pct / 100, t - s.sanierungsjahr);
+      } else {
+        /* Vor Sanierung: Bestandsmiete mit jährl. Steigerung */
+        bruttoMiete += e.kaltmiete * 12
+          * Math.pow(1 + s.mietsteigerung_pct / 100, t - 1);
+      }
+    }
+
+    /* 2–4. Abzüge Bewirtschaftung */
+    const mietausfall    = bruttoMiete * s.mietausfallwagnis_pct / 100;
+    const nettoMiete     = bruttoMiete - mietausfall;
+    const bewirtschaft   = nettoMiete  * s.bewirtschaftungskosten_pct / 100;
+    const flVerm         = vermEinh.reduce((a,e) => a + e.flaeche, 0);
+    /* Instandhaltung doppelt vor Sanierung */
+    const instandhalt    = flVerm * s.instandhaltung_pro_m2 * (isSaniert ? 1 : 2);
+    const nettomietertrag= nettoMiete - bewirtschaft - instandhalt;
+
+    /* 5. Schuldendienst */
+    const sd = this.schuldendienst(plaene, t);
+
+    /* 6. Cashflow vor Steuer */
+    const cfVorSteuer = nettomietertrag - sd.gesamt;
+
+    /* 7. Steuerliche Berechnung V+V (§21 EStG) */
+    const vermAnteil  = 1 - s.eigennutzungsanteil_pct / 100;
+    const gebaeudeAK  = this.gebaeudeAK(s);
+
+    /* AfA Gebäude (§7 Abs. 4 EStG, anteilig vermietet) */
+    const afaGebaeude = gebaeudeAK * vermAnteil * s.afa_satz_pct / 100;
+
+    /* AfA / Abzug Sanierung */
+    let afaSanierung     = 0;
+    let erhaltungsaufwand= 0;
+    const sanN = this.sanNetto(s) - this.bafaZuschuss(s); /* Netto nach Förderung */
+
+    if (t > s.sanierungsjahr) {
+      /* Herstellungskosten (HK) → AfA §7 Abs. 4 EStG */
+      const hk   = sanN * s.san_hk_pct   / 100 * vermAnteil;
+      /* Anschaffungsnaher Aufwand → wie HK §6 Abs.1 Nr.1a EStG */
+      const anak = sanN * s.san_anak_pct / 100 * vermAnteil;
+      afaSanierung = (hk + anak) * s.afa_satz_pct / 100;
+
+      /* Erhaltungsaufwand: Verteilung auf 5 Jahre §82b EStDV */
+      const ea = sanN * s.san_ea_pct / 100 * vermAnteil;
+      if (t <= s.sanierungsjahr + 5)
+        erhaltungsaufwand = ea / 5;
+    }
+
+    /* Steuerliches V+V-Ergebnis */
+    const ergebnisVV = nettoMiete     * vermAnteil
+                     - bewirtschaft   * vermAnteil
+                     - instandhalt    * vermAnteil
+                     - sd.zinsen      * vermAnteil
+                     - afaGebaeude
+                     - afaSanierung
+                     - erhaltungsaufwand;
+
+    /* Negativer Wert = steuerlicher Verlust = Steuerersparnis */
+    const steuereffekt = -ergebnisVV * s.grenzsteuersatz_pct / 100;
+    const cfNachSteuer = cfVorSteuer + steuereffekt;
+
+    /* 8. Eigennutzungs-Äquivalent (ortsübliche Miete, nicht in V+V) */
+    const enuAequi = eigEinheit
+      ? eigEinheit.flaeche * s.mietpotenzial_pro_m2 * 12
+        * Math.pow(1 + s.mietsteigerung_pct / 100, Math.max(0, t - s.sanierungsjahr))
+      : 0;
+
+    return {
+      t, isSaniert,
+      bruttoMiete, mietausfall, nettoMiete, bewirtschaft, instandhalt,
+      nettomietertrag,
+      zinsen: sd.zinsen, tilgung: sd.tilgung, restschuld: sd.restschuld,
+      cfVorSteuer,
+      afaGebaeude, afaSanierung, erhaltungsaufwand,
+      ergebnisVV, steuereffekt, cfNachSteuer,
+      enuAequi,
+    };
+  },
+
+  /* --- 30-Jahres-Timeline ------------------------------------------ */
+  timeline(s) {
+    const plaene = this.alleDarlehenPlaene(s, 30);
+    let kumulativCF = 0;
+    return Array.from({ length: 30 }, (_, i) => {
+      const j = this.jahresCashflow(s, plaene, i + 1);
+      kumulativCF += j.cfNachSteuer;
+      return { ...j, kumulativCF };
+    });
+  },
+
+  /* --- Kennzahlen --------------------------------------------------- */
+  kennzahlen(s) {
+    const tl    = this.timeline(s);
+    const nk    = this.kaufnebenkosten(s);
+    const foerd = this.foerderungGesamt(s);
+    const kfwEff= s.kfw_hoehe * (1 - this.kfwTilgungszuschuss(s) / 100);
+    const gesamtschuld = s.vd_hoehe + s.bank_kauf_hoehe + s.bank_san_hoehe + kfwEff;
+    const gesamtinv    = s.kaufpreis + nk + this.sanNetto(s) - foerd;
+    const j1    = tl[0];
+
+    /* Jahresmiete vermietet (aktuell) */
+    const jahrMiete = s.einheiten
+      .filter(e => !e.eigennutzung)
+      .reduce((a,e) => a + e.kaltmiete * 12, 0);
+
+    const bruttorendite    = jahrMiete / (s.kaufpreis + nk) * 100;
+    const nettomietrendite = j1.nettomietertrag / Math.max(gesamtinv, 1) * 100;
+    const tragfaehigkeit   = (j1.zinsen + j1.tilgung) > 0
+      ? j1.nettomietertrag / (j1.zinsen + j1.tilgung) : 99;
+
+    /* Konservativer Wertzuwachs: 1,5 % p.a. (Havixbeck) */
+    const basis = s.kaufpreis + this.sanNetto(s);
+    const wert10 = basis * Math.pow(1.015, 10);
+    const wert20 = basis * Math.pow(1.015, 20);
+
+    /* Eigenkapitalrendite über 10 Jahre (vereinfacht) */
+    const gew10 = tl.slice(0,10).reduce((a,j) => a + j.cfNachSteuer, 0)
+                + (wert10 - tl[9].restschuld - s.eigenkapital);
+    const ekRendite = s.eigenkapital > 0 ? (gew10 / s.eigenkapital / 10 * 100) : 0;
+
+    return {
+      bruttorendite, nettomietrendite, tragfaehigkeit,
+      cfJ1: j1.cfNachSteuer,
+      cfJ5: tl[4].cfNachSteuer,
+      cfJ10: tl[9].cfNachSteuer,
+      gesamtschuld, gesamtinv,
+      rs10: tl[9].restschuld,
+      wert10, wert20,
+      ekRendite,
+      kumulativCF30: tl[29].kumulativCF,
+      jahrMiete,
+    };
+  },
+
+  /* --- Sensitivitätsanalyse (Tornado) ------------------------------ */
+  sensitivitaet(s) {
+    const base = this.timeline(s).slice(0,10).reduce((a,j) => a + j.cfNachSteuer, 0);
+
+    const szenarien = [
+      { label: 'Sanierungskosten +30 %',
+        fn: s => { const c=tiefKopie(s); ['san_dach','san_fenster','san_heizung','san_elektrik','san_fassade','san_baeder','san_sonstiges'].forEach(k=>c[k]*=1.3); return c; } },
+      { label: 'Sanierungskosten −30 %',
+        fn: s => { const c=tiefKopie(s); ['san_dach','san_fenster','san_heizung','san_elektrik','san_fassade','san_baeder','san_sonstiges'].forEach(k=>c[k]*=0.7); return c; } },
+      { label: 'Bankzins +1,5 Pp',
+        fn: s => { const c=tiefKopie(s); c.bank_kauf_zinssatz+=1.5; c.bank_san_zinssatz+=1.5; return c; } },
+      { label: 'Bankzins −1,5 Pp',
+        fn: s => { const c=tiefKopie(s); c.bank_kauf_zinssatz=Math.max(0,c.bank_kauf_zinssatz-1.5); c.bank_san_zinssatz=Math.max(0,c.bank_san_zinssatz-1.5); return c; } },
+      { label: 'Miete n. San. +20 %',
+        fn: s => { const c=tiefKopie(s); c.mietpotenzial_pro_m2*=1.2; return c; } },
+      { label: 'Miete n. San. −20 %',
+        fn: s => { const c=tiefKopie(s); c.mietpotenzial_pro_m2*=0.8; return c; } },
+      { label: 'Mietausfall 0 %',
+        fn: s => { const c=tiefKopie(s); c.mietausfallwagnis_pct=0; return c; } },
+      { label: 'Mietausfall 10 %',
+        fn: s => { const c=tiefKopie(s); c.mietausfallwagnis_pct=10; return c; } },
+      { label: 'Volle Förderung (EH40+iSFP+BAFA)',
+        fn: s => { const c=tiefKopie(s); c.effizienzhaus='eh40ee'; c.isfp_bonus=true; c.bafa_heizung=true; return c; } },
+      { label: 'Keine Förderung',
+        fn: s => { const c=tiefKopie(s); c.effizienzhaus='bestand'; c.isfp_bonus=false; c.bafa_heizung=false; c.kfw_hoehe=0; return c; } },
+    ];
+
+    return szenarien.map(sz => {
+      const cf = this.timeline(sz.fn(s)).slice(0,10).reduce((a,j) => a + j.cfNachSteuer, 0);
+      return { label: sz.label, base, variant: cf, delta: cf - base };
+    });
+  },
+
+};
+
+
+/* ============================================================
+   EINGABE-KONFIGURATION (Slider + Number Felder)
+   ============================================================ */
+const EINGABEN = [
+  {
+    id:'kaufobjekt', label:'Kaufobjekt', icon:'🏠', open:true,
+    felder:[
+      { id:'kaufpreis',              label:'Kaufpreis',                      min:50000,  max:800000, step:5000,  unit:'€',      tip:'Vereinbarter Kaufpreis inkl. Nebengebäude.' },
+      { id:'grundstuecksanteil_pct', label:'Grundstücksanteil',              min:10,     max:80,     step:1,     unit:'%',      tip:'Anteil des Grundstücks am Kaufpreis. Relevant für AfA-Basis: Nur der Gebäudeanteil ist abschreibbar. Für Havixbeck: 671 m² × 260 €/m² ≈ 174 k€.' },
+      { id:'gesamtflaeche',          label:'Nutz-/Wohnfläche gesamt',        min:100,    max:800,    step:5,     unit:'m²',     tip:'Gesamte Nettogrundfläche aller Einheiten (ohne Keller, Außenflächen).' },
+      { id:'eigennutzungsanteil_pct',label:'Eigennutzungsanteil',            min:0,      max:60,     step:1,     unit:'%',      tip:'Anteil der eigengenutzten Fläche an der Gesamtfläche. Relevant für anteilige Abschreibung und Schuldzinsenabzug (§21 EStG).' },
+      { id:'nk_gre',                 label:'Grunderwerbsteuer',              min:3.5,    max:6.5,    step:0.5,   unit:'%',      tip:'NRW: 6,5 % gem. §1 GrEStG. Bemessungsgrundlage: Kaufpreis.' },
+      { id:'nk_notar',               label:'Notar + Grundbuch',              min:0.5,    max:3,      step:0.1,   unit:'%',      tip:'Ca. 1,5–2 % des Kaufpreises. Notarkosten §34 GNotKG, Grundbuchkosten §60 GNotKG.' },
+      { id:'nk_makler',              label:'Maklerprovision',                min:0,      max:4,      step:0.1,   unit:'%',      tip:'In NRW frei verhandelbar. 0 wenn Privatkauf direkt vom Verkäufer.' },
+    ]
+  },
+  {
+    id:'miete', label:'Mieteinnahmen', icon:'💶', open:true,
+    sonderfeld:'einheiten',
+    felder:[
+      { id:'mietpotenzial_pro_m2',   label:'Mietpotenzial n. San. (€/m²)',  min:5,      max:18,     step:0.1,   unit:'€/m²',   tip:'Erzielbare Kaltmiete nach Vollsanierung. Havixbeck/Münsterland: 8–11 €/m² für Wohnungen, 10–14 €/m² Gewerbe.' },
+      { id:'mietausfallwagnis_pct',  label:'Mietausfallwagnis',             min:0,      max:12,     step:0.5,   unit:'%',      tip:'Marktüblich 2–5 %. Berücksichtigt Leerstand, Mietausfall und Rechtskosten.' },
+      { id:'mietsteigerung_pct',     label:'Jährl. Mietsteigerung',         min:0,      max:5,      step:0.1,   unit:'%',      tip:'Annahme für Mietsteigerung p.a. (Inflation, Ortsüblichkeit). Historischer Schnitt Münsterland: ca. 1,5–2 %.' },
+      { id:'sanierungsjahr',         label:'Sanierung abgeschlossen Ende J.',min:1,      max:5,      step:1,     unit:'Jahr',   tip:'Ab diesem Jahr werden Sanierungsmieten und -kosten wirksam.' },
+    ]
+  },
+  {
+    id:'sanierung', label:'Sanierungskosten', icon:'🔨', open:false,
+    felder:[
+      { id:'san_dach',               label:'Dach inkl. Dämmung',            min:0,      max:120000, step:1000,  unit:'€',      tip:'Neueindeckung, Sparrendämmung oder Aufsparrendämmung, Dachrinnen. Orientierung: 80–150 €/m² Dachfläche.' },
+      { id:'san_fenster',            label:'Fenster komplett',               min:0,      max:80000,  step:1000,  unit:'€',      tip:'Dreifach-Verglasung, inkl. Montage. Orientierung: 600–1.200 €/Fenster.' },
+      { id:'san_heizung',            label:'Heizung',                       min:0,      max:80000,  step:1000,  unit:'€',      tip:'Inkl. Wärmeerzeuger, Verteilleitungen, Heizkörper/Fußbodenheizung, Hydraulischer Abgleich.' },
+      { id:'san_elektrik',           label:'Elektrik (DIN VDE 0100)',        min:0,      max:60000,  step:1000,  unit:'€',      tip:'Erneuerung Steig-/Steckleitungen, Unterverteilungen, FI-Schutzschalter gem. DIN VDE 0100 Teil 700/710.' },
+      { id:'san_fassade',            label:'Fassade WDVS',                  min:0,      max:100000, step:1000,  unit:'€',      tip:'Wärmedämmverbundsystem mind. 16 cm EPS/Mineralwolle. Ca. 120–200 €/m² Wandfläche.' },
+      { id:'san_baeder',             label:'Bäder / Sanitär',               min:0,      max:80000,  step:1000,  unit:'€',      tip:'Kompletterneuerung Bäder und WCs, inkl. Steigleitungen (Abwasser/Kaltwasser).' },
+      { id:'san_sonstiges',          label:'Puffer (Asbest, Statik, etc.)',  min:0,      max:60000,  step:1000,  unit:'€',      tip:'Reserve für Asbestentsorgung, statische Ertüchtigung, Steigleitungen Gas/Wasser, Unvorhergesehenes.' },
+      { id:'san_eigenleistung_pct',  label:'Eigenleistungsanteil',          min:0,      max:40,     step:1,     unit:'%',      tip:'Reduziert Cashbedarf, nicht förderfähig, steuerlich nicht abzugsfähig als Werbungskosten.' },
+    ],
+    sonderfeld:'san_klassifizierung',
+  },
+  {
+    id:'foerderung', label:'Förderung (KfW/BAFA)', icon:'🏛', open:false,
+    felder:[
+      { id:'foerderfaehige_kosten',  label:'Förderfähige Kostenbasis KfW',  min:0,      max:500000, step:5000,  unit:'€',      tip:'Energetisch förderfähige Maßnahmen (Dach, Fenster, Heizung, Fassade, Luftdichtheit). Basis für KfW 261.' },
+    ],
+    sonderfeld:'foerderung_selects',
+  },
+  {
+    id:'finanzierung', label:'Finanzierung', icon:'🏦', open:false,
+    sonderfeld:'finanzierung_gruppen',
+    felder:[
+      { id:'eigenkapital',           label:'Eigenkapital',                  min:0,      max:400000, step:5000,  unit:'€',      tip:'Eigene liquide Mittel. Faustregel: mind. Kaufnebenkosten aus EK.' },
+    ]
+  },
+  {
+    id:'steuern', label:'Steuern & Bewirtschaftung', icon:'📋', open:false,
+    felder:[
+      { id:'grenzsteuersatz_pct',    label:'Persönl. Grenzsteuersatz',      min:14,     max:45,     step:1,     unit:'%',      tip:'Grenzsteuersatz (öffentlicher Dienst Entgeltgruppe E10-E15: ca. 35–42 %). Relevant für Steuerersparnis aus V+V-Verlust.' },
+      { id:'bewirtschaftungskosten_pct',label:'Nicht umlagef. Bewirtschaftungskosten',min:5,max:30,step:0.5,unit:'%',tip:'Verwaltung, nicht umlagefähige Instandhaltung, Versicherung (Vermieteranteil). Marktüblich: 10–20 % der Kaltmiete.' },
+      { id:'instandhaltung_pro_m2',  label:'Instandhaltungsrücklage n. San.',min:2,     max:25,     step:0.5,   unit:'€/m²/J',tip:'Nach Vollsanierung: 6–10 €/m²/Jahr. Vor Sanierung wird automatisch verdoppelt.' },
+      { id:'afa_satz_pct',           label:'AfA-Satz Gebäude',              min:1,      max:3,      step:0.25,  unit:'%',      tip:'§7 Abs. 4 EStG: 2 % linear für Gebäude erbaut nach 31.12.1924. Bei Neubaustandard nach Sanierung prüfen: evtl. 3 % (§7 Abs. 4 S.1 Nr.1 EStG-neu).' },
+    ]
+  },
+];
+
+/* ============================================================
+   STATE-VERWALTUNG
+   ============================================================ */
+let STATE = tiefKopie(DEFAULTS);
+let SZENARIEN = [];    /* Gespeicherte Szenarien (max. 3) */
+
+function ladeState() {
+  try {
+    const raw = localStorage.getItem('mfh_kalk_state');
+    if (raw) {
+      const saved = JSON.parse(raw);
+      /* Einheiten-Array schützen – falls Schema veraltet */
+      if (!Array.isArray(saved.einheiten) || saved.einheiten.length === 0)
+        saved.einheiten = tiefKopie(DEFAULTS.einheiten);
+      STATE = saved;
+    }
+  } catch(e) { /* ignore */ }
+  try {
+    const raw2 = localStorage.getItem('mfh_kalk_szenarien');
+    if (raw2) SZENARIEN = JSON.parse(raw2);
+  } catch(e) { /* ignore */ }
+}
+
+function speichereState() {
+  try { localStorage.setItem('mfh_kalk_state', JSON.stringify(STATE)); } catch(e) {}
+}
+
+function resetDefaults() {
+  if (!confirm('Alle Eingaben auf Standardwerte zurücksetzen?')) return;
+  STATE = tiefKopie(DEFAULTS);
+  speichereState();
+  renderSidebar();
+  aktualisiere();
+}
+
+/* ============================================================
+   SIDEBAR-RENDERING
+   ============================================================ */
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = '';
+
+  for (const sek of EINGABEN) {
+    const details = document.createElement('details');
+    details.className = 'section-block';
+    if (sek.open) details.open = true;
+
+    details.innerHTML = `<summary><span class="section-icon">${sek.icon}</span>${sek.label}</summary>`;
+    const body = document.createElement('div');
+    body.className = 'section-body';
+
+    /* Sonderfeld: Einheiten-Tabelle */
+    if (sek.sonderfeld === 'einheiten') {
+      body.appendChild(renderEinheitenTabelle());
+    }
+
+    /* Sonderfeld: Finanzierungsgruppen */
+    if (sek.sonderfeld === 'finanzierung_gruppen') {
+      body.appendChild(renderFinanzierungsGruppen());
+    }
+
+    /* Sonderfeld: Förderung Selects */
+    if (sek.sonderfeld === 'foerderung_selects') {
+      body.appendChild(renderFoerderungSelects());
+    }
+
+    /* Sonderfeld: Sanierungsklassifizierung */
+    if (sek.sonderfeld === 'san_klassifizierung') {
+      body.appendChild(renderSanKlassifizierung());
+    }
+
+    /* Standard-Slider-Felder */
+    for (const f of (sek.felder ?? [])) {
+      body.appendChild(renderSliderFeld(f));
+    }
+
+    details.appendChild(body);
+    sidebar.appendChild(details);
+  }
+}
+
+/* Generiert ein Slider+Number Eingabepaar */
+function renderSliderFeld(f) {
+  const wrap = document.createElement('div');
+  wrap.className = 'input-group';
+  const val = STATE[f.id] ?? f.min;
+
+  wrap.innerHTML = `
+    <div class="input-label">
+      ${f.label}
+      <i class="info-icon" data-tip="${f.tip}">i</i>
+    </div>
+    <div class="input-pair-unit">
+      <input type="range"  id="sl_${f.id}" min="${f.min}" max="${f.max}" step="${f.step}" value="${val}">
+      <input type="number" id="num_${f.id}" min="${f.min}" max="${f.max}" step="${f.step}" value="${val}">
+      <span class="unit-label">${f.unit}</span>
+    </div>`;
+
+  /* Sync Slider ↔ Number + State-Update */
+  const sl  = wrap.querySelector(`#sl_${f.id}`);
+  const num = wrap.querySelector(`#num_${f.id}`);
+  sl.addEventListener('input',  () => { num.value = sl.value;  setVal(f.id, +sl.value); });
+  num.addEventListener('change',() => { sl.value  = num.value; setVal(f.id, +num.value); });
+
+  return wrap;
+}
+
+/* Einheiten-Tabelle */
+function renderEinheitenTabelle() {
+  const wrap = document.createElement('div');
+  let html = `<table class="einheiten-table">
+    <thead><tr>
+      <th>Einheit</th><th>m²</th><th>Miete €/Mo</th><th>Eigen?</th>
+    </tr></thead><tbody>`;
+
+  for (const e of STATE.einheiten) {
+    html += `<tr>
+      <td><input type="text"   class="eu-name" data-id="${e.id}" value="${e.name}" style="width:90px"></td>
+      <td><input type="number" class="eu-flaeche" data-id="${e.id}" value="${e.flaeche}" min="10" max="300" step="1" style="width:52px"></td>
+      <td><input type="number" class="eu-miete"   data-id="${e.id}" value="${e.kaltmiete}" min="0" max="5000" step="10" style="width:64px"></td>
+      <td style="text-align:center">
+        <label class="toggle" title="Eigennutzung">
+          <input type="checkbox" class="eu-eigen" data-id="${e.id}" ${e.eigennutzung ? 'checked' : ''}>
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+    </tr>`;
+  }
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+
+  /* Events für Einheiten */
+  wrap.querySelectorAll('.eu-name').forEach(el =>
+    el.addEventListener('change', () => setEinheit(+el.dataset.id, 'name', el.value)));
+  wrap.querySelectorAll('.eu-flaeche').forEach(el =>
+    el.addEventListener('change', () => setEinheit(+el.dataset.id, 'flaeche', +el.value)));
+  wrap.querySelectorAll('.eu-miete').forEach(el =>
+    el.addEventListener('change', () => setEinheit(+el.dataset.id, 'kaltmiete', +el.value)));
+  wrap.querySelectorAll('.eu-eigen').forEach(el =>
+    el.addEventListener('change', () => setEinheit(+el.dataset.id, 'eigennutzung', el.checked)));
+
+  return wrap;
+}
+
+/* Sanierungsklassifizierung (3-Wege-Aufteilung) */
+function renderSanKlassifizierung() {
+  const wrap = document.createElement('div');
+  const summe = STATE.san_hk_pct + STATE.san_ea_pct + STATE.san_anak_pct;
+  const warnVis = summe !== 100 ? '' : 'display:none';
+
+  wrap.innerHTML = `
+    <div class="input-label">
+      Steuerl. Klassifizierung Sanierungskosten
+      <i class="info-icon" data-tip="HK: Herstellungskosten → nur AfA. EA: Erhaltungsaufwand → §82b EStDV auf 5 J. verteilt. AN: Anschaffungsnaher Aufwand §6 Abs.1 Nr.1a EStG → wie HK, wenn >15 % der Gebäude-AK in 3 Jahren.">i</i>
+    </div>
+    <div class="san-split">
+      <div class="san-split-item">
+        <label>HK (AfA) %</label>
+        <input type="number" id="san_hk_pct"   value="${STATE.san_hk_pct}"   min="0" max="100" step="5">
+      </div>
+      <div class="san-split-item">
+        <label>Erh.-Aufw. %</label>
+        <input type="number" id="san_ea_pct"   value="${STATE.san_ea_pct}"   min="0" max="100" step="5">
+      </div>
+      <div class="san-split-item">
+        <label>Anschaff.-nah %</label>
+        <input type="number" id="san_anak_pct" value="${STATE.san_anak_pct}" min="0" max="100" step="5">
+      </div>
+    </div>
+    <div class="san-split-warning" id="san-split-warn" style="${warnVis}">⚠ Summe muss 100 % ergeben (aktuell ${summe} %)</div>`;
+
+  ['san_hk_pct','san_ea_pct','san_anak_pct'].forEach(id => {
+    wrap.querySelector(`#${id}`).addEventListener('change', e => {
+      setVal(id, +e.target.value);
+      /* Warntext aktualisieren */
+      const s2 = STATE.san_hk_pct + STATE.san_ea_pct + STATE.san_anak_pct;
+      const w = wrap.querySelector('#san-split-warn');
+      w.style.display = s2 !== 100 ? '' : 'none';
+      w.textContent = `⚠ Summe muss 100 % ergeben (aktuell ${s2} %)`;
+    });
+  });
+  return wrap;
+}
+
+/* Förderung: Selects + Toggles */
+function renderFoerderungSelects() {
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="input-group">
+      <div class="input-label">Zielniveau Effizienzhaus
+        <i class="info-icon" data-tip="KfW BEG 261 Tilgungszuschuss: EH85=5%, EH70EE=10%, EH55EE=15%, EH40EE=20% (Stand BEG 2024).">i</i>
+      </div>
+      <select id="effizienzhaus">
+        <option value="bestand" ${STATE.effizienzhaus==='bestand'?'selected':''}>Bestand (kein EH)</option>
+        <option value="eh85"   ${STATE.effizienzhaus==='eh85'?'selected':''}>EH 85 (5 %)</option>
+        <option value="eh70ee" ${STATE.effizienzhaus==='eh70ee'?'selected':''}>EH 70 EE (10 %)</option>
+        <option value="eh55ee" ${STATE.effizienzhaus==='eh55ee'?'selected':''}>EH 55 EE (15 %)</option>
+        <option value="eh40ee" ${STATE.effizienzhaus==='eh40ee'?'selected':''}>EH 40 EE (20 %)</option>
+      </select>
+    </div>
+    <div class="toggle-group">
+      <span class="toggle-label-text">iSFP-Bonus +5 %
+        <i class="info-icon" data-tip="Individ. Sanierungsfahrplan erhöht Tilgungszuschuss um 5 Pp. Voraussetzung: iSFP vor Maßnahmenbeginn.">i</i>
+      </span>
+      <label class="toggle"><input type="checkbox" id="isfp_bonus" ${STATE.isfp_bonus?'checked':''}><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-group">
+      <span class="toggle-label-text">BAFA Heizungstausch
+        <i class="info-icon" data-tip="BAFA-Förderung Wärmepumpe: 30% Grundförderung + 20% Klimabonus (Ersatz fossil) = 50%. Pellet: 35%. Gas-Hybrid: 0% (seit 2024 nicht förderfähig). Max. 30.000 €/WE.">i</i>
+      </span>
+      <label class="toggle"><input type="checkbox" id="bafa_heizung" ${STATE.bafa_heizung?'checked':''}><span class="toggle-slider"></span></label>
+    </div>
+    <div class="input-group">
+      <div class="input-label">Heizsystem-Typ (BAFA-Rate)
+        <i class="info-icon" data-tip="Bestimmt BAFA-Förderquote: Wärmepumpe 50 %, Pellet 35 %, Gas-Hybrid 0 % (seit 2024 nicht förderfähig). Wirkt nur wenn BAFA-Toggle aktiv.">i</i>
+      </div>
+      <select id="san_heizung_typ">
+        <option value="waermepumpe" ${STATE.san_heizung_typ==='waermepumpe'?'selected':''}>Wärmepumpe (Luft/Wasser, Sole/Wasser)</option>
+        <option value="pellet"      ${STATE.san_heizung_typ==='pellet'?'selected':''}>Pelletheizung</option>
+        <option value="gas_hybrid"  ${STATE.san_heizung_typ==='gas_hybrid'?'selected':''}>Gas-Hybrid (kein BAFA ab 2024)</option>
+      </select>
+    </div>`;
+
+  wrap.querySelector('#effizienzhaus').addEventListener('change',  e => setVal('effizienzhaus',   e.target.value));
+  wrap.querySelector('#isfp_bonus').addEventListener('change',     e => setVal('isfp_bonus',       e.target.checked));
+  wrap.querySelector('#bafa_heizung').addEventListener('change',   e => setVal('bafa_heizung',     e.target.checked));
+  wrap.querySelector('#san_heizung_typ').addEventListener('change',e => setVal('san_heizung_typ',  e.target.value));
+  return wrap;
+}
+
+/* Finanzierungsgruppen */
+function renderFinanzierungsGruppen() {
+  const wrap = document.createElement('div');
+  wrap.style.display = 'contents';
+
+  const gruppen = [
+    { titel:'Verkäuferdarlehen (Tante, zinslos)',
+      felder:[
+        { id:'vd_hoehe',              label:'Darlehensbetrag', min:0, max:500000, step:5000,  unit:'€',   tip:'Zinsfreies Darlehen vom Verkäufer. Privatrechtlich möglich; bei nahestehenden Personen Fremdvergleich beachten.' },
+        { id:'vd_tilgung_monatlich',  label:'Tilgung monatlich', min:0, max:3000,  step:50,   unit:'€/Mo', tip:'Monatliche Rückzahlungsrate an den Verkäufer.' },
+        { id:'vd_zinssatz',           label:'Zinssatz', min:0, max:6, step:0.1, unit:'%', tip:'Bei 0 % Zins gilt der Kredit als zinsfrei. Ggf. Schenkungsteuer prüfen bei Unverhältnismäßigkeit.' },
+      ]},
+    { titel:'Bankdarlehen Kauf',
+      felder:[
+        { id:'bank_kauf_hoehe',       label:'Betrag', min:0, max:400000, step:5000,  unit:'€',  tip:'Kreditbetrag für Kauffinanzierung.' },
+        { id:'bank_kauf_zinssatz',    label:'Zinssatz',min:0, max:8, step:0.1, unit:'%', tip:'Aktueller Sollzins p.a. Fixzins oder variabel.' },
+        { id:'bank_kauf_tilgung_pct', label:'Anfängl. Tilgung', min:1, max:5, step:0.1, unit:'%', tip:'Anfängliche Tilgungsrate. Annuität = Zins + Tilgung (konstant).' },
+        { id:'bank_kauf_zinsbindung', label:'Zinsbindung', min:5, max:30, step:1, unit:'J.', tip:'Nach Ablauf der Zinsbindung Anschlussfinanzierung zu Marktkonditionen.' },
+      ]},
+    { titel:'Bankdarlehen Sanierung',
+      felder:[
+        { id:'bank_san_hoehe',        label:'Betrag', min:0, max:400000, step:5000,  unit:'€',  tip:'Kreditbetrag für Sanierungsfinanzierung.' },
+        { id:'bank_san_zinssatz',     label:'Zinssatz',min:0, max:8, step:0.1, unit:'%', tip:'Sanierungsdarlehen ggf. höherer Zins als Kaufdarlehen.' },
+        { id:'bank_san_tilgung_pct',  label:'Anfängl. Tilgung', min:1, max:5, step:0.1, unit:'%' , tip:'Anfängliche Tilgungsrate des Sanierungsdarlehens.'},
+        { id:'bank_san_zinsbindung',  label:'Zinsbindung', min:5, max:30, step:1, unit:'J.', tip:'Zinsbindungsdauer Sanierungsdarlehen.' },
+      ]},
+    { titel:'KfW 261 Sanierungskredit',
+      felder:[
+        { id:'kfw_hoehe',             label:'Kreditbetrag', min:0, max:500000, step:5000,  unit:'€',  tip:'KfW 261: max. 150.000 € pro WE. Tilgungszuschuss wird automatisch abgezogen.' },
+        { id:'kfw_zinssatz',          label:'Effektivzins', min:0, max:6, step:0.1, unit:'%', tip:'Aktueller KfW-Zinssatz (Programm 261). Bitte tagesaktuell prüfen unter kfw.de.' },
+        { id:'kfw_laufzeit',          label:'Laufzeit', min:10, max:30, step:1, unit:'J.', tip:'Tilgungsfreie Anlaufjahre sind im vereinfachten Modell nicht berücksichtigt.' },
+      ]},
+  ];
+
+  for (const grp of gruppen) {
+    const grpDiv = document.createElement('div');
+    grpDiv.style.cssText = 'margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--rand)';
+    let html = `<div style="font-size:11px;font-weight:700;color:var(--akzent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">${grp.titel}</div>`;
+    grpDiv.innerHTML = html;
+
+    for (const f of grp.felder) {
+      grpDiv.appendChild(renderSliderFeld(f));
+    }
+    wrap.appendChild(grpDiv);
+  }
+
+  return wrap;
+}
+
+/* ============================================================
+   STATE-SETTER
+   ============================================================ */
+function setVal(id, val) {
+  STATE[id] = val;
+  speichereState();
+  aktualisiere();
+}
+
+function setEinheit(eid, key, val) {
+  const e = STATE.einheiten.find(x => x.id === eid);
+  if (e) { e[key] = val; speichereState(); aktualisiere(); }
+}
+
+
+/* ============================================================
+   KPI-DASHBOARD RENDERING
+   ============================================================ */
+function renderKPIs(kn) {
+  const grid = document.getElementById('kpi-grid');
+
+  /* Ampelfarben */
+  const tfKlasse = farbklasse(kn.tragfaehigkeit, 1.2, 1.0);
+  const brKlasse = farbklasse(kn.bruttorendite, 5, 3.5);
+  const nrKlasse = farbklasse(kn.nettomietrendite, 3.5, 2);
+  const cf1Klasse= kn.cfJ1 >= 0 ? 'gruen' : (kn.cfJ1 >= -500 ? 'gelb' : 'rot');
+  const ekKlasse = farbklasse(kn.ekRendite, 6, 3);
+
+  const karten = [
+    { label:'Bruttomietrendite',       value: pct(kn.bruttorendite),           sub: 'Jahreskaltmiete / (KP+NK)',    cls: brKlasse },
+    { label:'Nettomietrendite',        value: pct(kn.nettomietrendite),         sub: 'Nettomietertrag / Gesamtinv.', cls: nrKlasse },
+    { label:'Tragfähigkeitsindex',     value: fmtDez2.format(kn.tragfaehigkeit),sub: '<1,0 kritisch · >1,2 gut',     cls: tfKlasse },
+    { label:'Cashflow n.St. – Jahr 1', value: eur(kn.cfJ1),                     sub: 'Inkl. Steuereffekt V+V',       cls: cf1Klasse },
+    { label:'Cashflow n.St. – Jahr 5', value: eur(kn.cfJ5),                     sub: 'Nach Sanierungsabschluss',     cls: kn.cfJ5>=0?'gruen':'rot' },
+    { label:'Cashflow n.St. – J. 10',  value: eur(kn.cfJ10),                    sub: 'Mittelfristiger Horizont',     cls: kn.cfJ10>=0?'gruen':'rot' },
+    { label:'Gesamtschuld',            value: eur(kn.gesamtschuld),             sub: 'Alle Darlehen (KfW netto)',    cls: 'blau' },
+    { label:'Restschuld nach 10 J.',   value: eur(kn.rs10),                     sub: 'Geschätzter Wert: '+eur(kn.wert10),cls: 'blau' },
+    { label:'EK-Rendite (10 J.)',      value: pct(kn.ekRendite),                sub: 'CF + Vermögenszuwachs',        cls: ekKlasse },
+    { label:'Kumulativ CF 30 J.',      value: eur(kn.kumulativCF30),            sub: 'Summe CF nach Steuer',         cls: kn.kumulativCF30>=0?'gruen':'rot' },
+  ];
+
+  grid.innerHTML = karten.map(k => `
+    <div class="kpi-card ${k.cls}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+/* ============================================================
+   FINANZIERUNGSLÜCKE
+   ============================================================ */
+function renderFinGap() {
+  const saldo = CALC.finanzierungssaldo(STATE);
+  const cont = document.getElementById('fin-gap-container');
+  let cls, txt;
+  if (saldo >= 0) {
+    cls = 'fin-gap-ok';
+    txt = `✓ Finanzierung gedeckt: Überschuss ${eur(saldo)} (Eigenkapitalpuffer oder Liquiditätsreserve)`;
+  } else if (saldo >= -20000) {
+    cls = 'fin-gap-warn';
+    txt = `⚠ Kleine Finanzierungslücke: ${eur(Math.abs(saldo))} — bitte Darlehen oder EK anpassen.`;
+  } else {
+    cls = 'fin-gap-err';
+    txt = `✗ Finanzierungslücke: ${eur(Math.abs(saldo))} — Gesamtbedarf übersteigt Finanzierungsmittel.`;
+  }
+  cont.innerHTML = `<div class="fin-gap-banner ${cls}">${txt}</div>`;
+}
+
+/* ============================================================
+   JAHRESPLAN-TABELLE
+   ============================================================ */
+function renderPlanTabelle(tl) {
+  const tbody = document.getElementById('plan-tbody');
+  tbody.innerHTML = tl.map(j => {
+    const cfN = j.cfNachSteuer;
+    const cfK = j.kumulativCF;
+    return `<tr class="${j.isSaniert?'saniert':''}">
+      <td>${j.t}</td>
+      <td>${eur(j.bruttoMiete)}</td>
+      <td>${eur(j.nettomietertrag)}</td>
+      <td class="val-neg">${eur(j.zinsen)}</td>
+      <td class="val-neg">${eur(j.tilgung)}</td>
+      <td class="${j.cfVorSteuer>=0?'val-pos':'val-neg'}">${eur(j.cfVorSteuer)}</td>
+      <td class="${j.steuereffekt>=0?'val-pos':'val-neg'}">${eur(j.steuereffekt)}</td>
+      <td class="${cfN>=0?'val-pos':'val-neg'}">${eur(cfN)}</td>
+      <td class="${cfK>=0?'val-pos':'val-neg'}">${eur(cfK)}</td>
+      <td>${eur(j.restschuld)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ============================================================
+   CHART.JS INSTANZEN
+   ============================================================ */
+const CHARTS = {};
+const CHART_COLORS = {
+  akzent:   'rgba(37,99,235,',
+  gruen:    'rgba(22,163,74,',
+  rot:      'rgba(220,38,38,',
+  gelb:     'rgba(217,119,6,',
+  grau:     'rgba(100,116,139,',
+  hellblau: 'rgba(147,197,253,',
+  sand:     'rgba(251,191,36,',
+  lila:     'rgba(139,92,246,',
+};
+function cc(name, alpha) { return CHART_COLORS[name] + alpha + ')'; }
+
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: true,
+  plugins: {
+    legend: { labels: { font: { size: 11 }, boxWidth: 12, padding: 10 } },
+    tooltip: {
+      callbacks: {
+        label: ctx => {
+          const v = ctx.parsed.y ?? ctx.parsed;
+          return ' ' + (typeof v === 'number' ? fmt.format(v) + ' €' : v);
+        }
+      }
+    }
+  },
+  scales: {
+    x: { ticks: { font: { size: 10 } }, grid: { color: 'rgba(0,0,0,.04)' } },
+    y: { ticks: { font: { size: 10 }, callback: v => fmt.format(v) + ' €' }, grid: { color: 'rgba(0,0,0,.04)' } },
+  }
+};
+
+function initCharts() {
+  /* 1 – Cashflow-Verlauf 30 Jahre */
+  CHARTS.cashflow = new Chart(document.getElementById('chart-cashflow'), {
+    type: 'bar',
+    data: { labels:[], datasets:[] },
+    options: { ...CHART_DEFAULTS,
+      plugins: { ...CHART_DEFAULTS.plugins,
+        tooltip: { mode:'index', intersect:false } },
+      scales: { ...CHART_DEFAULTS.scales,
+        x: { ...CHART_DEFAULTS.scales.x, stacked:false },
+        y: { ...CHART_DEFAULTS.scales.y, stacked:false } }
+    }
+  });
+
+  /* 2 – Tilgungsverlauf */
+  CHARTS.tilgung = new Chart(document.getElementById('chart-tilgung'), {
+    type: 'line',
+    data: { labels:[], datasets:[] },
+    options: { ...CHART_DEFAULTS,
+      plugins: { ...CHART_DEFAULTS.plugins,
+        tooltip: { mode:'index', intersect:false } },
+      scales: { ...CHART_DEFAULTS.scales,
+        y: { ...CHART_DEFAULTS.scales.y, stacked:true } }
+    }
+  });
+
+  /* 3 – Finanzierungsstruktur (Donut) */
+  CHARTS.finanzierung = new Chart(document.getElementById('chart-finanzierung'), {
+    type: 'doughnut',
+    data: { labels:[], datasets:[] },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins: {
+        legend: { position:'bottom', labels:{ font:{size:11}, boxWidth:12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + eur(ctx.raw) } }
+      }
+    }
+  });
+
+  /* 4 – Sanierungskosten (horizontaler Balken) */
+  CHARTS.sanierung = new Chart(document.getElementById('chart-sanierung'), {
+    type: 'bar',
+    data: { labels:[], datasets:[] },
+    options: { ...CHART_DEFAULTS,
+      indexAxis: 'y',
+      plugins: { ...CHART_DEFAULTS.plugins, legend:{ display:false } },
+      scales: {
+        x: { ticks:{ font:{size:10}, callback: v => fmt.format(v)+' €' }, grid:{color:'rgba(0,0,0,.04)'} },
+        y: { ticks:{ font:{size:11} }, grid:{ display:false } }
+      }
+    }
+  });
+
+  /* 5 – Wasserfall */
+  CHARTS.wasserfall = new Chart(document.getElementById('chart-wasserfall'), {
+    type: 'bar',
+    data: { labels:[], datasets:[] },
+    options: { ...CHART_DEFAULTS,
+      plugins: { ...CHART_DEFAULTS.plugins,
+        legend:{ display:false },
+        tooltip: { callbacks: { label: ctx => ' ' + eur(ctx.raw) } } },
+    }
+  });
+
+  /* 6 – Sensitivitäts-Tornado */
+  CHARTS.sensitivitaet = new Chart(document.getElementById('chart-sensitivitaet'), {
+    type: 'bar',
+    data: { labels:[], datasets:[] },
+    options: { ...CHART_DEFAULTS,
+      indexAxis: 'y',
+      plugins: { ...CHART_DEFAULTS.plugins,
+        legend:{ display:false },
+        tooltip: { callbacks: { label: ctx => ' ' + eur(ctx.raw) } } },
+      scales: {
+        x: { ticks:{ font:{size:10}, callback: v => fmt.format(v)+' €' },
+             grid:{ color:'rgba(0,0,0,.04)' } },
+        y: { ticks:{ font:{size:11} }, grid:{ display:false } }
+      }
+    }
+  });
+}
+
+/* ============================================================
+   CHART-AKTUALISIERUNGEN
+   ============================================================ */
+function updateCashflowChart(tl) {
+  const labels = tl.map(j => 'J'+j.t);
+  CHARTS.cashflow.data = {
+    labels,
+    datasets: [
+      {
+        label:'CF vor Steuer',
+        data: tl.map(j => j.cfVorSteuer),
+        backgroundColor: tl.map(j => j.cfVorSteuer >= 0 ? cc('hellblau','0.8') : cc('rot','0.5')),
+        borderColor: tl.map(j => j.cfVorSteuer >= 0 ? cc('akzent','1') : cc('rot','1')),
+        borderWidth: 1, order: 2, type:'bar',
+      },
+      {
+        label:'CF nach Steuer',
+        data: tl.map(j => j.cfNachSteuer),
+        borderColor: cc('gruen','1'),
+        backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 2, type:'line', order:1,
+      },
+      {
+        label:'Kumulativ CF n.St.',
+        data: tl.map(j => j.kumulativCF),
+        borderColor: cc('sand','1'),
+        backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 0, borderDash:[4,3], type:'line', order:0,
+      }
+    ]
+  };
+  CHARTS.cashflow.update('none');
+}
+
+function updateTilgungChart(s) {
+  const plaene = CALC.alleDarlehenPlaene(s, 30);
+  const labels = Array.from({length:30},(_,i)=>'J'+(i+1));
+  const keys   = ['vd','bankKauf','bankSan','kfw'];
+  const namen  = ['Verkäuferdarlehen','Bank Kauf','Bank San.','KfW 261'];
+  const farben = [cc('lila','0.7'), cc('akzent','0.7'), cc('sand','0.7'), cc('gruen','0.7')];
+
+  CHARTS.tilgung.data = {
+    labels,
+    datasets: keys.map((k,i) => ({
+      label: namen[i],
+      data: plaene[k].map(p => p.restschuld),
+      backgroundColor: farben[i],
+      borderColor: farben[i].replace('0.7','1'),
+      fill: true,
+      borderWidth: 1.5,
+      pointRadius: 0,
+    }))
+  };
+  CHARTS.tilgung.options.plugins.tooltip = {
+    mode:'index', intersect:false,
+    callbacks:{ label: ctx => ' ' + ctx.dataset.label + ': ' + eur(ctx.raw) }
+  };
+  CHARTS.tilgung.update('none');
+}
+
+function updateFinanzierungChart(s) {
+  const kfwEff  = s.kfw_hoehe * (1 - CALC.kfwTilgungszuschuss(s) / 100);
+  const bafa    = CALC.bafaZuschuss(s);
+  const nk      = CALC.kaufnebenkosten(s);
+  const sanN    = CALC.sanNetto(s);
+
+  const vals  = [s.eigenkapital, s.vd_hoehe, s.bank_kauf_hoehe, s.bank_san_hoehe, kfwEff, bafa].filter(v => v > 0);
+  const lbls  = ['Eigenkapital','Verkäuferdarlehen','Bank Kauf','Bank Sanierung','KfW 261 (netto)','BAFA-Zuschuss'];
+  const clrs  = [cc('gruen','0.8'), cc('lila','0.8'), cc('akzent','0.8'), cc('sand','0.8'), cc('hellblau','0.9'), cc('grau','0.6')];
+
+  CHARTS.finanzierung.data = {
+    labels: lbls.filter((_,i) => [s.eigenkapital, s.vd_hoehe, s.bank_kauf_hoehe, s.bank_san_hoehe, kfwEff, bafa][i] > 0),
+    datasets: [{
+      data: vals,
+      backgroundColor: clrs.filter((_,i) => [s.eigenkapital, s.vd_hoehe, s.bank_kauf_hoehe, s.bank_san_hoehe, kfwEff, bafa][i] > 0),
+      borderWidth: 2,
+      borderColor: '#fff',
+    }]
+  };
+  CHARTS.finanzierung.update('none');
+}
+
+function updateSanierungChart(s) {
+  const posten = [
+    { label:'Dach', val:s.san_dach },
+    { label:'Fenster', val:s.san_fenster },
+    { label:'Heizung', val:s.san_heizung },
+    { label:'Elektrik', val:s.san_elektrik },
+    { label:'Fassade WDVS', val:s.san_fassade },
+    { label:'Bäder', val:s.san_baeder },
+    { label:'Puffer', val:s.san_sonstiges },
+  ].filter(p => p.val > 0).sort((a,b) => a.val-b.val);
+
+  const brutto = CALC.sanBrutto(s);
+  const bafa   = CALC.bafaZuschuss(s);
+  const kfwZ   = CALC.kfwZuschuss(s);
+
+  CHARTS.sanierung.data = {
+    labels: [...posten.map(p=>p.label), '– Eigenleistung', '– BAFA-Zuschuss', '– KfW-Zuschuss'],
+    datasets: [{
+      data: [...posten.map(p=>p.val),
+             -(brutto * s.san_eigenleistung_pct/100),
+             -bafa, -kfwZ],
+      backgroundColor: [
+        ...posten.map((_,i)=>cc('akzent',(0.4+i*0.08).toFixed(2))),
+        cc('gruen','0.5'), cc('gruen','0.7'), cc('gruen','0.9'),
+      ],
+      borderWidth: 1,
+      borderColor: '#fff',
+    }]
+  };
+  CHARTS.sanierung.update('none');
+}
+
+function updateWasserfallChart(tl, jahr) {
+  const j = tl[Math.min(Math.max(0,jahr-1),29)];
+  const schritte = [
+    { label:'Bruttomiete',    val: j.bruttoMiete,     base:0 },
+    { label:'- Mietausfall',  val:-j.mietausfall,     base:j.bruttoMiete },
+    { label:'- Bewirtschaft.',val:-j.bewirtschaft,    base:j.nettoMiete },
+    { label:'- Instandhalt.', val:-j.instandhalt,     base:j.nettoMiete-j.bewirtschaft },
+    { label:'= Nettomietertrag',val:0,                base:j.nettomietertrag, total:true },
+    { label:'- Zinsen',       val:-j.zinsen,          base:j.nettomietertrag },
+    { label:'- Tilgung',      val:-j.tilgung,         base:j.nettomietertrag-j.zinsen },
+    { label:'= CF v. Steuer', val:0,                  base:j.cfVorSteuer, total:true },
+    { label:'± Steuereffekt', val: j.steuereffekt,    base:j.cfVorSteuer },
+    { label:'= CF n. Steuer', val:0,                  base:j.cfNachSteuer, total:true },
+  ];
+
+  CHARTS.wasserfall.data = {
+    labels: schritte.map(s=>s.label),
+    datasets: [{
+      data: schritte.map(s => s.total ? s.base : s.val),
+      backgroundColor: schritte.map(s => {
+        if (s.total) return s.base >= 0 ? cc('akzent','0.9') : cc('rot','0.9');
+        return s.val >= 0 ? cc('gruen','0.7') : cc('rot','0.6');
+      }),
+      borderColor: '#fff', borderWidth: 1,
+    }]
+  };
+  CHARTS.wasserfall.options.scales.y.ticks.callback = v => fmt.format(v) + ' €';
+  CHARTS.wasserfall.update('none');
+}
+
+function updateSensitivitaetChart(sens) {
+  const sorted = [...sens].sort((a,b) => Math.abs(b.delta)-Math.abs(a.delta));
+  CHARTS.sensitivitaet.data = {
+    labels: sorted.map(s=>s.label),
+    datasets: [{
+      data: sorted.map(s=>s.delta),
+      backgroundColor: sorted.map(s => s.delta>=0 ? cc('gruen','0.7') : cc('rot','0.7')),
+      borderColor: sorted.map(s => s.delta>=0 ? cc('gruen','1') : cc('rot','1')),
+      borderWidth: 1,
+    }]
+  };
+  CHARTS.sensitivitaet.options.plugins.tooltip = {
+    callbacks:{
+      label: ctx => ` Delta 10-J.-CF: ${ctx.raw>=0?'+':''}${eur(ctx.raw)}`
+    }
+  };
+  CHARTS.sensitivitaet.update('none');
+}
+
+
+/* ============================================================
+   HAUPTFUNKTION: ALLES AKTUALISIEREN
+   ============================================================ */
+let waterfallJahr = 1;
+
+function aktualisiere() {
+  const tl   = CALC.timeline(STATE);
+  const kn   = CALC.kennzahlen(STATE);
+  const sens = CALC.sensitivitaet(STATE);
+
+  renderKPIs(kn);
+  renderFinGap();
+  renderPlanTabelle(tl);
+
+  updateCashflowChart(tl);
+  updateTilgungChart(STATE);
+  updateFinanzierungChart(STATE);
+  updateSanierungChart(STATE);
+  updateWasserfallChart(tl, waterfallJahr);
+  updateSensitivitaetChart(sens);
+
+  renderSzenarien();
+}
+
+/* ============================================================
+   SZENARIEN-VERWALTUNG
+   ============================================================ */
+function saveScenario() {
+  if (SZENARIEN.length >= 3) {
+    if (!confirm('Bereits 3 Szenarien gespeichert. Ältestes ersetzen?')) return;
+    SZENARIEN.shift();
+  }
+  const name = prompt('Szenario-Name (z.B. "Konservativ"):', 'Szenario ' + (SZENARIEN.length + 1));
+  if (!name) return;
+
+  const kn = CALC.kennzahlen(STATE);
+  SZENARIEN.push({
+    name,
+    state: tiefKopie(STATE),
+    kn,
+    zeit: new Date().toLocaleString('de-DE'),
+  });
+  try { localStorage.setItem('mfh_kalk_szenarien', JSON.stringify(SZENARIEN)); } catch(e) {}
+  renderSzenarien();
+}
+
+function deleteScenario(idx) {
+  SZENARIEN.splice(idx, 1);
+  try { localStorage.setItem('mfh_kalk_szenarien', JSON.stringify(SZENARIEN)); } catch(e) {}
+  renderSzenarien();
+}
+
+function ladeScenario(idx) {
+  if (!confirm('Aktuelle Eingaben durch Szenario ersetzen?')) return;
+  STATE = tiefKopie(SZENARIEN[idx].state);
+  speichereState();
+  renderSidebar();
+  aktualisiere();
+}
+
+function renderSzenarien() {
+  const area = document.getElementById('scenarios-area');
+  if (SZENARIEN.length === 0) {
+    area.innerHTML = '<p class="hint">Klicken Sie auf „📌 Szenario merken" (oben rechts), um aktuelle Eingaben zu speichern und später zu vergleichen. Bis zu 3 Szenarien möglich.</p>';
+    return;
+  }
+
+  let html = '<div class="scenarios-grid">';
+  SZENARIEN.forEach((sz, i) => {
+    const kn = sz.kn;
+    html += `
+    <div class="scenario-card">
+      <div class="scenario-header">
+        <span class="scenario-name">📌 ${sz.name}</span>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-outline btn-sm" onclick="ladeScenario(${i})">Laden</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteScenario(${i})">✕</button>
+        </div>
+      </div>
+      <div style="font-size:10.5px;color:var(--text-leicht);margin-bottom:8px">${sz.zeit}</div>
+      <div class="scenario-kpis">
+        <div class="scenario-kpi"><div class="scenario-kpi-label">Bruttomietrendite</div><div class="scenario-kpi-value">${pct(kn.bruttorendite)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">Nettomietrendite</div><div class="scenario-kpi-value">${pct(kn.nettomietrendite)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">Tragfähigkeit</div><div class="scenario-kpi-value">${fmtDez2.format(kn.tragfaehigkeit)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">CF J.1 n.St.</div><div class="scenario-kpi-value">${eur(kn.cfJ1)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">CF J.10 n.St.</div><div class="scenario-kpi-value">${eur(kn.cfJ10)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">Kum. CF 30 J.</div><div class="scenario-kpi-value">${eur(kn.kumulativCF30)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">Kaufpreis</div><div class="scenario-kpi-value">${eur(sz.state.kaufpreis)}</div></div>
+        <div class="scenario-kpi"><div class="scenario-kpi-label">Sanierung netto</div><div class="scenario-kpi-value">${eur(CALC.sanNetto(sz.state))}</div></div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+/* ============================================================
+   EXPORT-FUNKTIONEN
+   ============================================================ */
+function exportJSON() {
+  const payload = {
+    meta: { tool:'MFH-Wirtschaftlichkeitsrechner', version:'1.0', datum: new Date().toISOString() },
+    eingaben: STATE,
+    kennzahlen: CALC.kennzahlen(STATE),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'mfh_kalkulation_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
+   EVENT-HANDLER
+   ============================================================ */
+function bindWaterfall() {
+  const slider = document.getElementById('wf-year-slider');
+  const label  = document.getElementById('wf-year-label');
+  const val    = document.getElementById('wf-year-val');
+
+  slider.addEventListener('input', () => {
+    waterfallJahr = +slider.value;
+    label.textContent = waterfallJahr;
+    val.textContent   = waterfallJahr;
+    updateWasserfallChart(CALC.timeline(STATE), waterfallJahr);
+  });
+}
+
+/* ============================================================
+   INITIALISIERUNG
+   ============================================================ */
+function init() {
+  ladeState();
+  renderSidebar();
+  initCharts();
+  bindWaterfall();
+  aktualisiere();
+}
+
+/* Starten wenn DOM bereit */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+</script>
+</body>
+</html>
