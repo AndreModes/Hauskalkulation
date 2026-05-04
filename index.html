@@ -723,6 +723,383 @@ select {
   .chart-card canvas { max-height: 200px !important; }
   @page { margin: 15mm; }
 }
+
+/* ============================================================
+   TAB-NAVIGATION
+   ============================================================ */
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--rand);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-leicht);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: var(--transition);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.tab-btn:hover   { color: var(--akzent); background: var(--akzent-hell); }
+.tab-btn.active  { color: var(--akzent); border-bottom-color: var(--akzent); font-weight: 700; }
+
+.tab-panel       { display: none; }
+.tab-panel.active{ display: block; }
+
+/* ============================================================
+   INSIGHT-BOXEN (Strategische Hinweise)
+   ============================================================ */
+.insight-area { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+.insight-box {
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 12.5px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+.insight-box.rot    { background: var(--rot-hell);   border-color: #fca5a5; color: #7f1d1d; }
+.insight-box.gelb   { background: var(--gelb-hell);  border-color: #fde68a; color: #78350f; }
+.insight-box.gruen  { background: var(--gruen-hell); border-color: #86efac; color: #14532d; }
+.insight-box.blau   { background: var(--akzent-hell);border-color: #93c5fd; color: #1e3a8a; }
+.insight-icon       { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+/* ============================================================
+   STEUER-RECHNER (Tab: Steuern & Recht)
+   ============================================================ */
+.steuer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.steuer-karte {
+  background: var(--karte);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 16px;
+}
+
+.steuer-karte h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-leicht);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rand);
+}
+
+.steuer-zeile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 12.5px;
+  border-bottom: 1px solid #f8fafc;
+}
+.steuer-zeile:last-child { border-bottom: none; font-weight: 700; padding-top: 8px; margin-top: 4px; border-top: 2px solid var(--rand); }
+.steuer-zeile-label { color: var(--text-leicht); }
+.steuer-zeile-val   { font-family: 'SF Mono', monospace; font-weight: 600; }
+
+.zinswarn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  margin-top: 8px;
+}
+.zinswarn.rot    { background: var(--rot-hell);  color: #7f1d1d; }
+.zinswarn.gelb   { background: var(--gelb-hell); color: #78350f; }
+.zinswarn.gruen  { background: var(--gruen-hell);color: #14532d; }
+.zinswarn.blau   { background: var(--akzent-hell);color: #1e3a8a; }
+
+/* ============================================================
+   PFLICHTTEIL-VISUALISIERUNG
+   ============================================================ */
+.pflichtteil-bar-wrap {
+  background: var(--karte);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.pflicht-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pflicht-slider-row label { font-size: 12px; color: var(--text-leicht); white-space: nowrap; }
+.pflicht-slider-row span  { font-family: 'SF Mono', monospace; font-weight: 700; min-width: 60px; }
+
+.pflichtteil-bar {
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--rot) 0%, var(--gelb) 40%, var(--gruen) 70%, #e2e8f0 70%);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.pflichtteil-fill {
+  height: 100%;
+  background: var(--rot);
+  opacity: .7;
+  transition: width .3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+}
+
+/* ============================================================
+   SZENARIEN-VERGLEICH (Tab: Szenarien)
+   ============================================================ */
+.szen-header {
+  display: grid;
+  grid-template-columns: 180px repeat(3, 1fr);
+  gap: 0;
+  margin-bottom: 0;
+}
+
+.szen-header-zelle {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.szen-a { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.szen-b { background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
+.szen-c { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+
+.szen-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--karte);
+  border-radius: 0 0 var(--radius) var(--radius);
+  overflow: hidden;
+  box-shadow: var(--schatten-md);
+}
+
+.szen-table th {
+  background: #f8fafc;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-leicht);
+  text-align: left;
+  border-bottom: 1px solid var(--rand);
+  width: 180px;
+}
+
+.szen-table td {
+  padding: 7px 14px;
+  font-size: 12.5px;
+  text-align: right;
+  border-bottom: 1px solid #f8fafc;
+  font-family: 'SF Mono', monospace;
+}
+
+.szen-table tr:hover td { background: #f8fafc; }
+
+.szen-table tr.summe td {
+  font-weight: 700;
+  background: #f1f5f9;
+  border-top: 2px solid var(--rand);
+  font-size: 13px;
+}
+
+.szen-table td.gut     { color: var(--gruen); }
+.szen-table td.warn    { color: var(--gelb); }
+.szen-table td.schlecht{ color: var(--rot); }
+
+.szen-table td.a-col { border-left: 3px solid #fde68a; }
+.szen-table td.b-col { border-left: 3px solid #93c5fd; }
+.szen-table td.c-col { border-left: 3px solid #86efac; }
+
+.szen-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.szen-input-karte {
+  background: var(--karte);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 14px;
+}
+.szen-input-karte.a { border-top: 3px solid #fde68a; }
+.szen-input-karte.b { border-top: 3px solid #93c5fd; }
+.szen-input-karte.c { border-top: 3px solid #86efac; }
+.szen-input-karte h4 {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-leicht);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.szen-field { margin-bottom: 8px; }
+.szen-field label { display: block; font-size: 11px; color: var(--text-leicht); margin-bottom: 2px; }
+.szen-field input, .szen-field select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--rand-dunkel);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: 'SF Mono', monospace;
+}
+
+/* ============================================================
+   LIQUIDITÄTS-ZEITACHSE
+   ============================================================ */
+.liq-timeline {
+  background: var(--karte);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.liq-phase {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.liq-phase::before {
+  content: '';
+  position: absolute;
+  left: 46px;
+  top: 32px;
+  bottom: -16px;
+  width: 2px;
+  background: var(--rand);
+}
+.liq-phase:last-child::before { display: none; }
+
+.liq-phase-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--akzent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-left: 30px;
+}
+
+.liq-phase-body { flex: 1; }
+
+.liq-phase-titel {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.liq-phase-betrag {
+  font-family: 'SF Mono', monospace;
+  font-weight: 700;
+  color: var(--rot);
+  font-size: 14px;
+}
+
+.liq-phase-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.liq-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.liq-item-name { color: var(--text-leicht); }
+.liq-item-val  { font-family: 'SF Mono', monospace; font-weight: 600; }
+
+.liq-kumulativ {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 16px;
+}
+.liq-kumulativ.ok   { background: var(--gruen-hell); color: #14532d; }
+.liq-kumulativ.warn { background: var(--gelb-hell);  color: #78350f; }
+.liq-kumulativ.err  { background: var(--rot-hell);   color: #7f1d1d; }
+
+/* ============================================================
+   TESTERGEBNIS-CONSOLE
+   ============================================================ */
+.test-console {
+  background: #0f172a;
+  color: #94a3b8;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.test-ok   { color: #4ade80; }
+.test-fail { color: #f87171; }
+.test-info { color: #60a5fa; }
+.test-warn { color: #fbbf24; }
+
+@media (max-width: 900px) {
+  .szen-inputs-grid { grid-template-columns: 1fr; }
+  .szen-header, .szen-table { font-size: 11px; }
+}
 </style>
 </head>
 <body>
@@ -759,6 +1136,23 @@ select {
 
   <!-- HAUPT-CONTENT -->
   <main class="content">
+
+    <!-- TAB-NAVIGATION -->
+    <nav class="tab-nav" id="tab-nav">
+      <button class="tab-btn active" data-tab="wirtschaft">📊 Wirtschaftlichkeit</button>
+      <button class="tab-btn" data-tab="steuern">⚖ Steuern &amp; Recht</button>
+      <button class="tab-btn" data-tab="risiko">👨‍👩‍👧 Familie &amp; Risiko</button>
+      <button class="tab-btn" data-tab="liquiditaet">💧 Liquidität</button>
+      <button class="tab-btn" data-tab="szenarien">🔀 Szenarien-Vergleich</button>
+    </nav>
+
+    <!-- ======================================================
+         TAB 1: WIRTSCHAFTLICHKEIT (bestehend)
+         ====================================================== -->
+    <div class="tab-panel active" id="tab-wirtschaft">
+
+    <!-- Insight-Boxen -->
+    <div class="insight-area" id="insight-area"></div>
 
     <!-- Kennzahlen-Dashboard -->
     <div class="content-section">
@@ -836,13 +1230,226 @@ select {
       </div>
     </div>
 
-    <!-- Szenarien-Vergleich -->
+    <!-- Szenarien-Merken (alt, bleibt als Backup) -->
     <div class="content-section">
-      <div class="content-section-title">Szenarien-Vergleich</div>
+      <div class="content-section-title">Schnell-Szenarien (Wirtschaftlichkeit)</div>
       <div id="scenarios-area">
-        <p class="hint">Klicken Sie auf „📌 Szenario merken" (oben rechts), um die aktuellen Eingaben zu speichern. Bis zu 3 Szenarien können verglichen werden.</p>
+        <p class="hint">Klicken Sie auf „📌 Szenario merken", um aktuelle Eingaben zu speichern. Den vollständigen Szenarien-Vergleich (A/B/C parallel) finden Sie im Tab <strong>Szenarien-Vergleich</strong>.</p>
       </div>
     </div>
+
+    </div><!-- /tab-panel#tab-wirtschaft -->
+
+    <!-- ======================================================
+         TAB 2: STEUERN & RECHT
+         ====================================================== -->
+    <div class="tab-panel" id="tab-steuern">
+      <div class="insight-area" id="steuer-insight-area"></div>
+
+      <!-- Eingaben Steuermodul -->
+      <div class="content-section">
+        <div class="content-section-title">Steuer-Parameter</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+          <div style="background:var(--karte);border-radius:var(--radius);box-shadow:var(--schatten);padding:16px">
+            <h4 style="font-size:11.5px;font-weight:700;color:var(--text-leicht);text-transform:uppercase;margin-bottom:12px">Kaufsituation</h4>
+            <div class="input-group"><div class="input-label">Kaufpreis (Nennwert) <i class="info-icon" data-tip="Vereinbarter Kaufpreis. Differenz zum Verkehrswert = Schenkungsanteil.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_kaufpreis" min="100000" max="900000" step="5000" value="550000">
+                <input type="number" id="st_kaufpreis"    min="100000" max="900000" step="5000" value="550000">
+                <span class="unit-label">€</span></div></div>
+            <div class="input-group"><div class="input-label">Verkehrswert (Sanierungsstau) <i class="info-icon" data-tip="Gutachterlicher Verkehrswert mit bestehendem Sanierungsstau (ImmoWertV). Differenz zu Kaufpreis = fiktive Schenkung.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_verkehrswert" min="200000" max="1200000" step="10000" value="540000">
+                <input type="number" id="st_verkehrswert"    min="200000" max="1200000" step="10000" value="540000">
+                <span class="unit-label">€</span></div></div>
+            <div class="input-group"><div class="input-label">Inventar-Abzug (§9 Abs.1 Nr.1 GrEStG) <i class="info-icon" data-tip="Einbauküche, Markisen, Heizöl etc. können von GrESt-Bemessungsgrundlage abgezogen werden wenn separat in Kaufvertrag ausgewiesen.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_inventar" min="0" max="30000" step="500" value="0">
+                <input type="number" id="st_inventar"    min="0" max="30000" step="500" value="0">
+                <span class="unit-label">€</span></div></div>
+          </div>
+          <div style="background:var(--karte);border-radius:var(--radius);box-shadow:var(--schatten);padding:16px">
+            <h4 style="font-size:11.5px;font-weight:700;color:var(--text-leicht);text-transform:uppercase;margin-bottom:12px">Verkäuferdarlehen</h4>
+            <div class="input-group"><div class="input-label">Darlehensbetrag <i class="info-icon" data-tip="Verkäuferdarlehen der Tante. Bei Zins unter Marktüblichkeit: Zinsvorteil ist fiktive Schenkung §15 BewG.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_vd_betrag" min="0" max="700000" step="10000" value="550000">
+                <input type="number" id="st_vd_betrag"    min="0" max="700000" step="10000" value="550000">
+                <span class="unit-label">€</span></div></div>
+            <div class="input-group"><div class="input-label">Zinssatz Verkäuferdarlehen <i class="info-icon" data-tip="Unter 2 %: Schenkungsteuerrisiko auf Zinsvorteil. 2–3,5 %: grenzwertig. Über 3,5 %: fremdüblich.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_vd_zins" min="0" max="5" step="0.1" value="2.5">
+                <input type="number" id="st_vd_zins"    min="0" max="5" step="0.1" value="2.5">
+                <span class="unit-label">%</span></div>
+              <div class="zinswarn" id="zins-ampel"></div></div>
+            <div class="input-group"><div class="input-label">Laufzeit</div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_vd_laufzeit" min="5" max="40" step="1" value="30">
+                <input type="number" id="st_vd_laufzeit"    min="5" max="40" step="1" value="30">
+                <span class="unit-label">J.</span></div></div>
+            <div class="input-group"><div class="input-label">Marktüblicher Vergleichszins <i class="info-icon" data-tip="Für Berechnung des Zinsvorteils nach §15 BewG. Aktueller Bankzins als Referenz.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_markt_zins" min="1" max="7" step="0.1" value="3.5">
+                <input type="number" id="st_markt_zins"    min="1" max="7" step="0.1" value="3.5">
+                <span class="unit-label">%</span></div></div>
+          </div>
+          <div style="background:var(--karte);border-radius:var(--radius);box-shadow:var(--schatten);padding:16px">
+            <h4 style="font-size:11.5px;font-weight:700;color:var(--text-leicht);text-transform:uppercase;margin-bottom:12px">Steuerklasse &amp; GrESt</h4>
+            <div class="input-group"><div class="input-label">Steuerklasse Käufer zu Verkäufer <i class="info-icon" data-tip="Klasse I: Ehegatte/Kinder FB 500k/400k. Klasse II: Geschwister/Neffen FB 20k. Klasse III: Fremde FB 20k.">i</i></div>
+              <select id="st_steuerklasse">
+                <option value="II" selected>Klasse II – Neffe/Nichte (FB 20.000 €)</option>
+                <option value="I_kind">Klasse I – Kind (FB 400.000 €)</option>
+                <option value="I_ehe">Klasse I – Ehegatte (FB 500.000 €)</option>
+                <option value="III">Klasse III – Fremde (FB 20.000 €)</option>
+              </select></div>
+            <div class="input-group"><div class="input-label">Bundesland (GrESt-Satz) <i class="info-icon" data-tip="Grunderwerbsteuersatz je Bundesland. NRW: 6,5 %. Bayern: 3,5 %. §1 GrEStG.">i</i></div>
+              <select id="st_grunderwerbland">
+                <option value="6.5" selected>NRW – 6,5 %</option>
+                <option value="3.5">Bayern/Sachsen – 3,5 %</option>
+                <option value="5.0">Berlin/Brandenburg – 6,0 %</option>
+                <option value="5.0">Niedersachsen/Sachsen-Anh. – 5,0 %</option>
+                <option value="6.0">Baden-Württemberg – 5,0 %</option>
+                <option value="6.5">Schleswig-Holstein/Thür. – 6,5 %</option>
+              </select></div>
+            <div class="input-group"><div class="input-label">Schenkungen letzte 10 J. (§ 14 ErbStG) <i class="info-icon" data-tip="Vorschenkungen werden innerhalb von 10 Jahren zusammengerechnet. Freibetrag wird anteilig verbraucht.">i</i></div>
+              <div class="input-pair-unit">
+                <input type="range"  id="sl_st_vorschenkung" min="0" max="200000" step="5000" value="0">
+                <input type="number" id="st_vorschenkung"    min="0" max="200000" step="5000" value="0">
+                <span class="unit-label">€</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Steuerberechnungs-Ergebnis -->
+      <div class="content-section">
+        <div class="content-section-title">Berechnungsergebnisse</div>
+        <div class="steuer-grid" id="steuer-ergebnis-grid"></div>
+      </div>
+
+      <!-- Tilgungsplan Verkäuferdarlehen -->
+      <div class="content-section">
+        <div class="content-section-title">Tilgungsplan Verkäuferdarlehen (Steuertab)</div>
+        <div class="plan-table-wrapper" style="max-height:220px">
+          <table class="plan-table" id="vd-plan-table">
+            <thead><tr>
+              <th>J.</th><th>Jahresrate</th><th>Zins</th><th>Tilgung</th><th>Restschuld</th>
+              <th>Erbschaftsteuer auf RS</th>
+            </tr></thead>
+            <tbody id="vd-plan-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /tab-steuern -->
+
+    <!-- ======================================================
+         TAB 3: FAMILIE & RISIKO
+         ====================================================== -->
+    <div class="tab-panel" id="tab-risiko">
+
+      <!-- Familienstruktur -->
+      <div class="content-section">
+        <div class="content-section-title">Familienstruktur &amp; Pflichtteil-Parameter</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:16px">
+          <div style="background:var(--karte);border-radius:var(--radius);box-shadow:var(--schatten);padding:16px">
+            <h4 style="font-size:11.5px;font-weight:700;color:var(--text-leicht);text-transform:uppercase;margin-bottom:12px">Tante</h4>
+            <div class="input-group"><div class="input-label">Aktuelles Alter Tante <i class="info-icon" data-tip="Beeinflusst statistische Lebenserwartung und damit Wahrscheinlichkeit von Pflichtteilsergänzungsansprüchen innerhalb 10 J.">i</i></div>
+              <div class="input-pair-unit"><input type="range" id="sl_tante_alter" min="50" max="85" step="1" value="70"><input type="number" id="tante_alter" min="50" max="85" step="1" value="70"><span class="unit-label">J.</span></div></div>
+            <div class="input-group"><div class="input-label">Aktuelles Alter Ehemann <i class="info-icon" data-tip="Alter des einzigen Pflichtteilsberechtigten.">i</i></div>
+              <div class="input-pair-unit"><input type="range" id="sl_tanteeh_alter" min="50" max="90" step="1" value="72"><input type="number" id="tanteeh_alter" min="50" max="90" step="1" value="72"><span class="unit-label">J.</span></div></div>
+            <div class="toggle-group">
+              <span class="toggle-label-text">Pflichtteilsverzicht Ehemann notariell beurkundet <i class="info-icon" data-tip="Notarieller Pflichtteilsverzicht §2346 BGB eliminiert das Pflichtteilsergänzungsrisiko vollständig. Dringend empfohlen bei Schenkungsanteil.">i</i></span>
+              <label class="toggle"><input type="checkbox" id="pflichtteil_verzicht"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div style="background:var(--karte);border-radius:var(--radius);box-shadow:var(--schatten);padding:16px">
+            <h4 style="font-size:11.5px;font-weight:700;color:var(--text-leicht);text-transform:uppercase;margin-bottom:12px">Pflichtteil-Konfiguration</h4>
+            <div class="input-group"><div class="input-label">Pflichtteilsquote Ehemann <i class="info-icon" data-tip="Bei Zugewinngemeinschaft ohne Kinder/Eltern: Ehemann hat gesetzl. Erbquote 3/4, Pflichtteil = 1/2 davon = 3/8. Vereinfachung möglich. §2303 + §1931 BGB.">i</i></div>
+              <div class="input-pair-unit"><input type="range" id="sl_pflichtteil_quote" min="10" max="60" step="1" value="37.5"><input type="number" id="pflichtteil_quote" min="10" max="60" step="0.5" value="37.5"><span class="unit-label">%</span></div></div>
+            <div class="input-group"><div class="input-label">Schenkungsanteil (fiktiv) <i class="info-icon" data-tip="Verkehrswert minus Kaufpreis + kapitalisierter Zinsvorteil. Basis für §2325 BGB.">i</i></div>
+              <div class="input-pair-unit"><input type="range" id="sl_schenkungsanteil" min="0" max="400000" step="5000" value="0"><input type="number" id="schenkungsanteil" min="0" max="400000" step="5000" value="0"><span class="unit-label">€</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pflichtteil Sterbezeitpunkt-Slider -->
+      <div class="content-section">
+        <div class="content-section-title">Sterbezeitpunkt-Sensitivität (§ 2325 BGB)</div>
+        <div class="pflichtteil-bar-wrap">
+          <div class="pflicht-slider-row">
+            <label>Tante stirbt in Jahr:</label>
+            <input type="range" id="sterbe_jahr_slider" min="1" max="30" value="15" style="flex:1">
+            <span id="sterbe_jahr_val">15</span>
+            <label style="margin-left:12px">nach Notartermin</label>
+          </div>
+          <div id="pflichtteil-ergebnis-area"></div>
+        </div>
+
+        <!-- Heatmap Chart -->
+        <div class="chart-card" style="margin-top:12px">
+          <h3>Pflichtteilsergänzungsrisiko nach Sterbezeitpunkt</h3>
+          <canvas id="chart-pflichtteil" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Strategische Erlasse -->
+      <div class="content-section">
+        <div class="content-section-title">Strategische Erlasse &amp; §14 ErbStG-Optimierung</div>
+        <div class="steuer-grid" id="erlass-grid"></div>
+      </div>
+    </div><!-- /tab-risiko -->
+
+    <!-- ======================================================
+         TAB 4: LIQUIDITÄT
+         ====================================================== -->
+    <div class="tab-panel" id="tab-liquiditaet">
+      <div class="content-section">
+        <div class="content-section-title">Liquiditätsbedarf Zeitachse</div>
+        <div id="liquiditaet-timeline"></div>
+      </div>
+      <div class="content-section">
+        <div class="content-section-title">Kumulativer Liquiditätsbedarf</div>
+        <div class="chart-card"><canvas id="chart-liquiditaet" height="220"></canvas></div>
+      </div>
+    </div><!-- /tab-liquiditaet -->
+
+    <!-- ======================================================
+         TAB 5: SZENARIEN-VERGLEICH
+         ====================================================== -->
+    <div class="tab-panel" id="tab-szenarien">
+
+      <!-- Szenario-Eingaben A/B/C -->
+      <div class="content-section">
+        <div class="content-section-title">Szenarien-Eingaben</div>
+        <div class="szen-inputs-grid" id="szen-inputs-grid"></div>
+      </div>
+
+      <!-- Vergleichstabelle -->
+      <div class="content-section">
+        <div class="content-section-title">Steuer- &amp; Kostenvergleich</div>
+        <div id="szen-vergleich-container"></div>
+      </div>
+
+      <!-- Charts Szenarien -->
+      <div class="content-section">
+        <div class="content-section-title">Visualisierungen</div>
+        <div class="charts-grid">
+          <div class="chart-card chart-card--full">
+            <h3>Steuerliche Gesamtbelastung nach Szenario &amp; Sterbezeitpunkt</h3>
+            <canvas id="chart-szen-steuern" height="220"></canvas>
+          </div>
+          <div class="chart-card chart-card--full">
+            <h3>Cashflow nach Steuern – 30 Jahre – Szenario-Vergleich</h3>
+            <canvas id="chart-szen-cashflow" height="220"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test-Suite -->
+      <div class="content-section">
+        <div class="content-section-title">Berechnungs-Validierung (Test-Suite)</div>
+        <button class="btn btn-outline btn-sm" onclick="runTests()">▶ Tests ausführen</button>
+        <div class="test-console" id="test-console">Klicken Sie auf „Tests ausführen"…</div>
+      </div>
+    </div><!-- /tab-szenarien -->
 
   </main>
 </div>
@@ -940,10 +1547,89 @@ const DEFAULTS = {
   eigenkapital:           50000,
 
   /* Steuern & Bewirtschaftung */
-  grenzsteuersatz_pct:    38,
+  grenzsteuersatz_pct:    42,
   bewirtschaftungskosten_pct: 15,
   instandhaltung_pro_m2:  8,       /* €/m²/Jahr nach Sanierung */
   afa_satz_pct:           2.0,     /* §7 Abs. 4 EStG – 2 % linear Bj. >1924 */
+
+  /* Sanierungskosten – aktualisiert auf Vollsanierung */
+  san_dach:               50000,
+  san_fenster:            40000,
+  san_heizung:            60000,
+  san_elektrik:           65000,
+  san_fassade:            55000,
+  san_baeder:             60000,
+  san_sonstiges:          70000,   /* 40k Schadstoff + 30k Reserve */
+};
+
+/* ============================================================
+   STEUER-DEFAULTS (Familien-Konstellation Tante–Neffe)
+   ============================================================ */
+const STEUER_DEFAULTS = {
+  kaufpreis:          550000,
+  verkehrswert:       540000,   /* mit Sanierungsstau – editierbar */
+  inventarAbzug:      0,
+  vdBetrag:           550000,
+  vdZins:             2.5,
+  vdLaufzeit:         30,
+  marktZins:          3.5,
+  steuerklasse:       'II',      /* Neffe zu Tante §15 Abs. 1 Nr. 3 ErbStG */
+  grunderwerbSatz:    6.5,       /* NRW §11 Abs. 1 GrEStG */
+  vorschenkung:       0,         /* §14 ErbStG – innerhalb 10 Jahre */
+  tanteAlter:         70,
+  tanteEhAlter:       72,
+  pflichtteilVerzicht:false,
+  pflichtteilQuote:   37.5,      /* 3/4 × 1/2 §2303 + §1931 + §1371 BGB */
+  schenkungsanteil:   0,         /* auto. berechnet aus verkehrswert - kaufpreis */
+  sterbeJahr:         15,
+};
+
+/* Szenarien-Defaults A / B / C */
+const SZEN_DEFAULTS = {
+  A: {
+    name:              'A – Naive Schenkung',
+    cls:               'a',
+    kaufpreis:         400000,
+    verkehrswert:      700000,   /* saniert */
+    vdBetrag:          0,
+    vdZins:            0,
+    vdLaufzeit:        0,
+    pflichtteilVerzicht: false,
+    erlass10Jahre:     0,
+    sterbeJahr:        15,
+  },
+  B: {
+    name:              'B – Darlehen 2,5 % / 30 J.',
+    cls:               'b',
+    kaufpreis:         550000,
+    verkehrswert:      540000,
+    vdBetrag:          550000,
+    vdZins:            2.5,
+    vdLaufzeit:        30,
+    pflichtteilVerzicht: true,
+    erlass10Jahre:     20000,    /* strategische Jahresfreibetrag-Erlasse */
+    sterbeJahr:        15,
+  },
+  C: {
+    name:              'C – Kompromiss 2,0 %',
+    cls:               'c',
+    kaufpreis:         500000,
+    verkehrswert:      540000,
+    vdBetrag:          450000,
+    vdZins:            2.0,
+    vdLaufzeit:        30,
+    pflichtteilVerzicht: true,
+    erlass10Jahre:     20000,
+    sterbeJahr:        15,
+  },
+};
+
+/* lokale Steuer-State-Variable */
+let ST = { ...STEUER_DEFAULTS };
+let SZEN = {
+  A: { ...SZEN_DEFAULTS.A },
+  B: { ...SZEN_DEFAULTS.B },
+  C: { ...SZEN_DEFAULTS.C },
 };
 
 /* ============================================================
@@ -965,6 +1651,200 @@ const BAFA_RATE = {
   waermepumpe: 0.50,
   pellet:      0.35,
   gas_hybrid:  0.00,
+};
+
+/* ============================================================
+   STEUER_CALC – Steuer- und Rechtsberechnungen (reine Funktionen)
+   Referenzen: ErbStG §§ 1,14,15,16,19; BGB §§ 2303,2325,2346;
+               GrEStG § 1,3; BewG §§ 13,14,15; EStG §§ 6,7,21
+   ============================================================ */
+const STEUER_CALC = {
+
+  /* ----------------------------------------------------------------
+     §19 ErbStG – Tariftabelle (Klasse I / II / III)
+     Flat-Rate pro Wertstufe + Härteausgleich §19 Abs. 3 ErbStG
+     ---------------------------------------------------------------- */
+  TAFEL: [
+    { grenze:    75000, I: .07, II: .15, III: .30 },
+    { grenze:   300000, I: .11, II: .20, III: .30 },
+    { grenze:   600000, I: .15, II: .25, III: .30 },
+    { grenze:  6000000, I: .19, II: .30, III: .30 },
+    { grenze: 13000000, I: .23, II: .35, III: .50 },
+    { grenze: 26000000, I: .27, II: .40, III: .50 },
+    { grenze: Infinity, I: .30, II: .43, III: .50 },
+  ],
+
+  /* §16 ErbStG – Freibeträge (pro Person, alle 10 Jahre §14) */
+  FREIBETRAEGE: {
+    I_ehe:   500000,   /* Ehegatte */
+    I_kind:  400000,   /* Kinder / Enkel (Eltern verstorben) */
+    I_sonst: 100000,   /* sonstige Klasse I */
+    II:       20000,   /* Geschwister, Neffen, Nichten */
+    III:      20000,   /* Fremde */
+  },
+
+  freibetrag(klasse) {
+    return this.FREIBETRAEGE[klasse] ?? 20000;
+  },
+
+  /* Steuersatz aus Tafel (flat rate für gesamten steuerpfl. Betrag) */
+  steuersatz(stpBetrag, klasse) {
+    for (const s of this.TAFEL) {
+      if (stpBetrag <= s.grenze) return s[klasse] ?? s.III;
+    }
+    return this.TAFEL[this.TAFEL.length - 1][klasse] ?? .50;
+  },
+
+  /* Steuerpflichtiger Erwerb nach Freibetrag und Vorschenkungen §14 */
+  steuerpflichtig(betrag, klasse, vorschenkung = 0) {
+    const fb = this.freibetrag(klasse);
+    const verbraucht = Math.min(vorschenkung, fb);
+    return Math.max(0, betrag - (fb - verbraucht));
+  },
+
+  /* Schenkung-/Erbschaftsteuer §19 ErbStG mit Härteausgleich §19 Abs. 3 */
+  steuer(betrag, klasse, vorschenkung = 0) {
+    const stp = this.steuerpflichtig(betrag, klasse, vorschenkung);
+    if (stp <= 0) return 0;
+
+    const satz = this.steuersatz(stp, klasse);
+    let steuer  = stp * satz;
+
+    /* Härteausgleich: Finde nächste niedrigere Stufe */
+    let unterGrenze = 0;
+    let unterSatz   = 0;
+    for (const s of this.TAFEL) {
+      if (stp <= s.grenze) break;
+      unterGrenze = s.grenze;
+      unterSatz   = s[klasse] ?? s.III;
+    }
+    if (unterGrenze > 0) {
+      const steuerUnter = unterGrenze * unterSatz;
+      const maxSteuer   = steuerUnter + (stp - unterGrenze) * 0.5; /* §19 Abs.3 */
+      steuer = Math.min(steuer, maxSteuer);
+    }
+    return Math.round(steuer);
+  },
+
+  /* ----------------------------------------------------------------
+     §2325 BGB – Pflichtteilsergänzungsanspruch
+     Abschmelzung: 10 % pro vollendetem Jahr nach Schenkung
+     ---------------------------------------------------------------- */
+  pflichtteilErgaenzung(schenkung, jahreNachSchenkung, pflichtteilQuote) {
+    if (pflichtteilQuote <= 0 || schenkung <= 0) return 0;
+    const anrechnungsquote = Math.max(0, 1 - Math.floor(jahreNachSchenkung) * 0.1);
+    return Math.round(schenkung * anrechnungsquote * pflichtteilQuote / 100);
+  },
+
+  /* ----------------------------------------------------------------
+     §15 BewG – Zinsvorteil bei unverzinslichem / niedrig verzinstem
+     Verkäuferdarlehen → kapitalisierter Barwert der Zinsersparnis
+     ---------------------------------------------------------------- */
+  zinsvorteilPV(darlehen, vertragsZins, marktZins, laufzeit) {
+    if (darlehen <= 0 || vertragsZins >= marktZins || laufzeit <= 0) return 0;
+    const jErsparnis = darlehen * (marktZins - vertragsZins) / 100;
+    const r = marktZins / 100;
+    /* PV Annuity Factor */
+    const pvF = (1 - Math.pow(1 + r, -laufzeit)) / r;
+    return Math.round(jErsparnis * pvF);
+  },
+
+  /* ----------------------------------------------------------------
+     Grunderwerbsteuer §1 GrEStG
+     Bei gemischter Schenkung: nur Kaufpreisanteil steuerpflichtig (§3 Nr.2)
+     ---------------------------------------------------------------- */
+  grunderwerbsteuer(kaufpreis, inventarAbzug, steuersatz, schenkungsanteil = 0) {
+    const basisgesamt = Math.max(0, kaufpreis - inventarAbzug);
+    /* Schenkungsanteil GrESt-frei nach §3 Nr.2 GrEStG */
+    const stpBasis = Math.max(0, basisgesamt - schenkungsanteil);
+    return Math.round(stpBasis * steuersatz / 100);
+  },
+
+  /* ----------------------------------------------------------------
+     Monatliche Annuität (Annuitätendarlehen, Standard-Formel)
+     Validierung: 700.000 € × 2,5 % / 30 J. → 2.766 €/Monat
+     ---------------------------------------------------------------- */
+  annuitaetMonatlich(kapital, zinssatzPA, laufzeitJahre) {
+    if (kapital <= 0 || laufzeitJahre <= 0) return 0;
+    if (zinssatzPA <= 0) return kapital / (laufzeitJahre * 12);
+    const r = zinssatzPA / 100 / 12;
+    const n = laufzeitJahre * 12;
+    return kapital * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  },
+
+  /* ----------------------------------------------------------------
+     Amortisierungsplan Verkäuferdarlehen (annuitätisch, monatlich)
+     inkl. optionaler Jahreserlasse alle 10 J.
+     ---------------------------------------------------------------- */
+  vdPlan(betrag, zinssatzPA, laufzeit, erlass10Jahre = 0) {
+    const plan = [];
+    if (betrag <= 0) {
+      for (let t = 1; t <= 30; t++) plan.push({ t, zins:0, tilgung:0, restschuld:0, erlass:0 });
+      return plan;
+    }
+    const annMonatl = this.annuitaetMonatlich(betrag, zinssatzPA, laufzeit);
+    const annJahrl  = annMonatl * 12;
+    let restschuld  = betrag;
+
+    for (let t = 1; t <= 30; t++) {
+      if (restschuld <= 0.01) {
+        plan.push({ t, zins:0, tilgung:0, restschuld:0, erlass:0, annuitaet:0 }); continue;
+      }
+      const zins    = restschuld * zinssatzPA / 100;
+      const tilgung = Math.min(Math.max(annJahrl - zins, 0), restschuld);
+      restschuld    = Math.max(0, restschuld - tilgung);
+      /* Strategischer Erlass alle 10 Jahre (Jahresfreibetrag §16 ErbStG) */
+      const erlass  = (t % 10 === 0) ? Math.min(erlass10Jahre, restschuld) : 0;
+      restschuld    = Math.max(0, restschuld - erlass);
+      plan.push({ t, zins, tilgung, restschuld, erlass, annuitaet: zins + tilgung });
+    }
+    return plan;
+  },
+
+  /* ----------------------------------------------------------------
+     Vollständige Steuer-Gesamtbelastung eines Szenarios bei Tod in Jahr T
+     ---------------------------------------------------------------- */
+  szenarioSteuergesamt(sz, sterbeJahr, grunderwerbSatz = 6.5, vorschenkung = 0) {
+    const schenkungsanteil = Math.max(0, sz.verkehrswert - sz.kaufpreis);
+    const klasse = 'II';
+
+    /* 1. Schenkungsteuer auf direkten Schenkungsanteil beim Kauf */
+    const stKauf = this.steuer(schenkungsanteil, klasse, vorschenkung);
+
+    /* 2. Zinsvorteil §15 BewG → Schenkungsteuer */
+    const zinsvor = this.zinsvorteilPV(sz.vdBetrag, sz.vdZins, 3.5, sz.vdLaufzeit);
+    const stZins  = zinsvor > 0 ? this.steuer(zinsvor, klasse, vorschenkung + schenkungsanteil) : 0;
+
+    /* 3. Grunderwerbsteuer §1 GrEStG (Schenkungsanteil §3 Nr.2 befreit) */
+    const gre = this.grunderwerbsteuer(sz.kaufpreis, 0, grunderwerbSatz, schenkungsanteil);
+
+    /* 4. Pflichtteilsergänzung §2325 BGB (wenn kein Verzicht) */
+    const gesamtSchenkung = schenkungsanteil + zinsvor;
+    const pflichtteil = sz.pflichtteilVerzicht ? 0
+      : this.pflichtteilErgaenzung(gesamtSchenkung, sterbeJahr, 37.5);
+
+    /* 5. Erbschaftsteuer auf erloschene Restschuld bei Tod */
+    const plan   = this.vdPlan(sz.vdBetrag, sz.vdZins, sz.vdLaufzeit, sz.erlass10Jahre ?? 0);
+    const rsJahr = Math.min(sterbeJahr, 30);
+    const rsTod  = plan[rsJahr - 1]?.restschuld ?? 0;
+    /* Erlassene Restschuld = steuerpflichtiger Erwerb bei Tod */
+    const stErb  = rsTod > 0 ? this.steuer(rsTod, klasse, vorschenkung) : 0;
+
+    const gesamt = stKauf + stZins + gre + pflichtteil + stErb;
+    return { schenkungsanteil, zinsvor, stKauf, stZins, gre, pflichtteil, stErb, rsTod, gesamt };
+  },
+
+  /* Cashflow-Vergleich über 30 J. (nur Schuldendienst VD + steuerl. Ersparnisse) */
+  szenarioCashflow(sz, grenzsteuersatz = 42) {
+    const plan  = this.vdPlan(sz.vdBetrag, sz.vdZins, sz.vdLaufzeit, sz.erlass10Jahre ?? 0);
+    const sanJ  = 2; /* Sanierungsjahr */
+    return plan.map(p => {
+      /* Zinsen (VD) steuerlich abzugsfähig anteilig vermietet (ca. 76 % Fremdanteil) */
+      const zinsenAbzug = p.zins * 0.76 * grenzsteuersatz / 100;
+      const cfNetto     = -(p.zins + p.tilgung) + zinsenAbzug;
+      return { t: p.t, schuldendienst: p.zins + p.tilgung, cfNetto, restschuld: p.restschuld };
+    });
+  },
 };
 
 /* ============================================================
@@ -2013,6 +2893,646 @@ function updateSensitivitaetChart(sens) {
 
 
 /* ============================================================
+   INSIGHT-BOXEN (Tab 1: Wirtschaftlichkeit)
+   ============================================================ */
+function renderInsights() {
+  const s    = STATE;
+  const area = document.getElementById('insight-area');
+  const msgs = [];
+
+  /* Anschaffungsnaher Aufwand §6 Abs.1 Nr.1a EStG */
+  const gebaeudeAK = CALC.gebaeudeAK(s);
+  const sanVerm    = CALC.sanNetto(s) * (1 - s.eigennutzungsanteil_pct / 100);
+  if (sanVerm > gebaeudeAK * 0.15) {
+    msgs.push({ cls:'rot', icon:'⚠',
+      text: `Anschaffungsnaher Aufwand: Sanierungskosten (${eur(sanVerm)}) übersteigen 15 % der Gebäude-AK (${eur(gebaeudeAK * 0.15)}). § 6 Abs. 1 Nr. 1a EStG greift – Kosten nur über AfA absetzbar, nicht sofort. Ggf. Maßnahmen ins Jahr 4+ verschieben.` });
+  }
+
+  /* Tragfähigkeit */
+  const kn = CALC.kennzahlen(s);
+  if (kn.tragfaehigkeit < 1.0) {
+    msgs.push({ cls:'rot', icon:'🚨',
+      text: `Tragfähigkeitsindex ${fmtDez2.format(kn.tragfaehigkeit)} – Nettomietertrag deckt nicht den Schuldendienst. Quersubvention aus Gehalt nötig.` });
+  } else if (kn.tragfaehigkeit < 1.2) {
+    msgs.push({ cls:'gelb', icon:'⚠',
+      text: `Tragfähigkeitsindex ${fmtDez2.format(kn.tragfaehigkeit)} – knapp ausreichend. Puffer für Mietausfall/Zinsanstieg prüfen.` });
+  }
+
+  /* Fremdmieten-Vergleich */
+  const fremdmieten = s.einheiten.filter(e => !e.eigennutzung).reduce((a,e) => a + e.kaltmiete, 0);
+  msgs.push({ cls:'blau', icon:'ℹ',
+    text: `Referenz: Fremdmieten aktuell ${eur(fremdmieten * 12)}/Jahr (${eur(fremdmieten)}/Monat). Vergleichen Sie damit alle monatlichen Belastungen.` });
+
+  area.innerHTML = msgs.map(m =>
+    `<div class="insight-box ${m.cls}"><span class="insight-icon">${m.icon}</span><span>${m.text}</span></div>`
+  ).join('');
+}
+
+/* ============================================================
+   STEUER-ERGEBNIS (Tab 2: Steuern & Recht)
+   ============================================================ */
+function renderSteuerErgebnis() {
+  const s  = ST;
+  const sa = Math.max(0, s.verkehrswert - s.kaufpreis);
+
+  /* Schenkungsteuer auf direkten Schenkungsanteil */
+  const stKauf = STEUER_CALC.steuer(sa, s.steuerklasse, s.vorschenkung);
+  const zv     = STEUER_CALC.zinsvorteilPV(s.vdBetrag, s.vdZins, s.marktZins, s.vdLaufzeit);
+  const stZins = zv > 0 ? STEUER_CALC.steuer(zv, s.steuerklasse, s.vorschenkung + sa) : 0;
+  const gre    = STEUER_CALC.grunderwerbsteuer(s.kaufpreis, s.inventarAbzug, s.grunderwerbSatz, sa);
+  const ann    = STEUER_CALC.annuitaetMonatlich(s.vdBetrag, s.vdZins, s.vdLaufzeit);
+
+  const grid = document.getElementById('steuer-ergebnis-grid');
+  grid.innerHTML = `
+    <div class="steuer-karte">
+      <h4>Schenkung &amp; Grunderwerbsteuer</h4>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Kaufpreis</span><span class="steuer-zeile-val">${eur(s.kaufpreis)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Verkehrswert (Sanierungsstau)</span><span class="steuer-zeile-val">${eur(s.verkehrswert)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Schenkungsanteil (VW − KP)</span><span class="steuer-zeile-val ${sa>0?'val-neg':''}">${eur(sa)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Freibetrag ${s.steuerklasse} (§16 ErbStG)</span><span class="steuer-zeile-val">${eur(STEUER_CALC.freibetrag(s.steuerklasse))}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Schenkungsteuer auf KP-Vorteil</span><span class="steuer-zeile-val ${stKauf>0?'val-neg':''}">${eur(stKauf)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">GrESt (${s.grunderwerbSatz} % auf ${eur(s.kaufpreis - sa)})</span><span class="steuer-zeile-val val-neg">${eur(gre)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label"><strong>Summe Erwerb-Steuern</strong></span><span class="steuer-zeile-val val-neg"><strong>${eur(stKauf + gre)}</strong></span></div>
+    </div>
+    <div class="steuer-karte">
+      <h4>Zinsvorteil §15 BewG (Schenkungsteuer)</h4>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">VD-Betrag</span><span class="steuer-zeile-val">${eur(s.vdBetrag)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Vertragsrate</span><span class="steuer-zeile-val">${pct(s.vdZins)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Marktüblicher Vergleichszins</span><span class="steuer-zeile-val">${pct(s.marktZins)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Kapitalisierter Zinsvorteil (PV)</span><span class="steuer-zeile-val ${zv>0?'val-neg':''}">${eur(zv)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Schenkungsteuer darauf</span><span class="steuer-zeile-val ${stZins>0?'val-neg':''}">${eur(stZins)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Jährl. Zinsersparnis</span><span class="steuer-zeile-val">${eur(s.vdBetrag * (s.marktZins - s.vdZins) / 100)}/J.</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Monatl. Annuität (Berechnet)</span><span class="steuer-zeile-val">${eur(ann)}/Mo.</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Fremdmieten (Referenz)</span><span class="steuer-zeile-val">2.090 €/Mo.</span></div>
+    </div>
+    <div class="steuer-karte">
+      <h4>Bewertung GrESt-Befreiung (§3 GrEStG)</h4>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Verhältnis Käufer–Verkäufer</span><span class="steuer-zeile-val">Tante–Neffe</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">§3 Nr.4 (Ehegatte)</span><span class="steuer-zeile-val">❌ nein</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">§3 Nr.6 (gerade Linie)</span><span class="steuer-zeile-val">❌ nein</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Schenkungsanteil §3 Nr.2</span><span class="steuer-zeile-val">${sa>0?'✅ GrESt-frei auf '+eur(sa):'– kein Schenkungsanteil'}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label">Notar- &amp; Grundbuchkosten (ca.)</span><span class="steuer-zeile-val val-neg">${eur(s.kaufpreis * 0.015)}</span></div>
+      <div class="steuer-zeile"><span class="steuer-zeile-label"><strong>Gesamte Erwerbsnebenkosten</strong></span><span class="steuer-zeile-val val-neg"><strong>${eur(stKauf + stZins + gre + s.kaufpreis * 0.015 + 7800)}</strong></span></div>
+    </div>`;
+
+  /* Zins-Ampel */
+  let zinsCls, zinsTxt;
+  if (s.vdZins <= 0)         { zinsCls='rot';   zinsTxt='Zinslos: Schenkungsteuer auf gesamten Zinsvorteil nahezu sicher (§15 BewG). Steuerberater-Pflicht!'; }
+  else if (s.vdZins < 1)    { zinsCls='rot';   zinsTxt='Sehr niedriger Zins: Schenkungsteuerrisiko auf Zinsvorteil hoch (§15 BewG). Mit Steuerberater abstimmen.'; }
+  else if (s.vdZins < 2)    { zinsCls='gelb';  zinsTxt='Niedriger Zins: Fremdvergleich grenzwertig. Steuerberater empfohlen.'; }
+  else if (s.vdZins <= 3.5) { zinsCls='gruen'; zinsTxt='Zins marktüblich – Schenkungsteuerrisiko auf Zinsvorteil gering.'; }
+  else                       { zinsCls='blau';  zinsTxt='Voll fremdüblicher Zins – kein Zinsvorteil-Risiko.'; }
+  document.getElementById('zins-ampel').className = `zinswarn ${zinsCls}`;
+  document.getElementById('zins-ampel').textContent = zinsTxt;
+
+  /* VD-Tilgungsplan */
+  renderVDPlan();
+
+  /* Steuer-Insights */
+  const si = document.getElementById('steuer-insight-area');
+  const insightMsgs = [];
+  if (s.vdZins < 2) insightMsgs.push({ cls:'rot', icon:'⚠', text:`Zinssatz ${s.vdZins} % unter 2 % – §15 BewG: Jahreswert des Zinsvorteils ist fiktive Schenkung. Kapitalisierter Wert: ${eur(zv)}.` });
+  if (sa > 0) insightMsgs.push({ cls:'gelb', icon:'ℹ', text:`Schenkungsanteil ${eur(sa)}: Freibetrag Klasse II = 20.000 €/10 J. Steuerpflichtiger Rest: ${eur(Math.max(0, sa - 20000))}.` });
+  if (sa > 0 && !ST.pflichtteilVerzicht) insightMsgs.push({ cls:'rot', icon:'🚨', text:`Pflichtteilsverzicht fehlt! Ehemann kann bis ${eur(STEUER_CALC.pflichtteilErgaenzung(sa + zv, 0, 37.5))} Pflichtteilsergänzung fordern (§2325 BGB).` });
+  si.innerHTML = insightMsgs.map(m => `<div class="insight-box ${m.cls}"><span class="insight-icon">${m.icon}</span><span>${m.text}</span></div>`).join('');
+}
+
+/* VD-Tilgungsplan Tabelle */
+function renderVDPlan() {
+  const s   = ST;
+  const plan= STEUER_CALC.vdPlan(s.vdBetrag, s.vdZins, s.vdLaufzeit, 20000);
+  const tbody = document.getElementById('vd-plan-tbody');
+  tbody.innerHTML = plan.map(p => {
+    const erbSt = STEUER_CALC.steuer(p.restschuld, s.steuerklasse, 0);
+    return `<tr>
+      <td>${p.t}</td>
+      <td>${eur(p.annuitaet ?? 0)}</td>
+      <td class="val-neg">${eur(p.zins)}</td>
+      <td>${eur(p.tilgung)}</td>
+      <td>${eur(p.restschuld)}</td>
+      <td class="${erbSt > 5000 ? 'val-neg' : 'val-pos'}">${eur(erbSt)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ============================================================
+   PFLICHTTEIL & RISIKO (Tab 3: Familie & Risiko)
+   ============================================================ */
+function renderPflichtteilErgebnis() {
+  const s         = ST;
+  const sterbeJ   = parseInt(document.getElementById('sterbe_jahr_slider')?.value ?? 15);
+  document.getElementById('sterbe_jahr_val').textContent = sterbeJ;
+  const gesamtSch = Math.max(0, s.verkehrswert - s.kaufpreis)
+                  + STEUER_CALC.zinsvorteilPV(s.vdBetrag, s.vdZins, s.marktZins, s.vdLaufzeit);
+  const verzicht  = document.getElementById('pflichtteil_verzicht')?.checked ?? false;
+  const quote     = parseFloat(document.getElementById('pflichtteil_quote')?.value ?? 37.5);
+  const pflicht   = verzicht ? 0 : STEUER_CALC.pflichtteilErgaenzung(gesamtSch, sterbeJ, quote);
+  const anrechn   = Math.max(0, 1 - Math.floor(sterbeJ) * 0.1);
+
+  const area = document.getElementById('pflichtteil-ergebnis-area');
+  if (!area) return;
+
+  const cl = pflicht === 0 ? 'val-pos' : (pflicht < 20000 ? '' : 'val-neg');
+  area.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:12px">
+      <div class="kpi-card ${verzicht ? 'gruen' : (pflicht > 0 ? 'rot' : 'gruen')}">
+        <div class="kpi-label">Pflichtteilsergänzung</div>
+        <div class="kpi-value">${eur(pflicht)}</div>
+        <div class="kpi-sub">Bei Tod in Jahr ${sterbeJ}</div>
+      </div>
+      <div class="kpi-card blau">
+        <div class="kpi-label">Anrechnungsquote §2325</div>
+        <div class="kpi-value">${Math.round(anrechn * 100)} %</div>
+        <div class="kpi-sub">${sterbeJ >= 10 ? '10+ Jahre → 0 %' : sterbeJ + ' J. nach Schenkung'}</div>
+      </div>
+      <div class="kpi-card blau">
+        <div class="kpi-label">Schenkungsbasis gesamt</div>
+        <div class="kpi-value">${eur(gesamtSch)}</div>
+        <div class="kpi-sub">KP-Vorteil + Zinsvorteil PV</div>
+      </div>
+      <div class="kpi-card ${verzicht ? 'gruen' : 'gelb'}">
+        <div class="kpi-label">Pflichtteilsverzicht</div>
+        <div class="kpi-value">${verzicht ? '✓ Ja' : '✗ Nein'}</div>
+        <div class="kpi-sub">${verzicht ? 'Risiko eliminiert' : 'Notariell beurkunden!'}</div>
+      </div>
+    </div>`;
+
+  /* Pflichtteil-Chart aktualisieren */
+  updatePflichtteilChart(gesamtSch, quote, verzicht);
+}
+
+/* Pflichtteil-Chart (Linienchart über Sterbejahre) */
+function updatePflichtteilChart(gesamtSchenkung, quote, verzicht) {
+  if (!CHARTS.pflichtteil) return;
+  const jahre = Array.from({ length: 30 }, (_, i) => i + 1);
+  const werte = jahre.map(t => verzicht ? 0 : STEUER_CALC.pflichtteilErgaenzung(gesamtSchenkung, t, quote));
+  CHARTS.pflichtteil.data = {
+    labels: jahre.map(t => 'J.' + t),
+    datasets: [{
+      label: 'Pflichtteilsergänzung €',
+      data: werte,
+      borderColor: 'rgba(220,38,38,1)',
+      backgroundColor: 'rgba(220,38,38,.15)',
+      fill: true, borderWidth: 2, pointRadius: 3,
+    }]
+  };
+  CHARTS.pflichtteil.update('none');
+}
+
+/* ============================================================
+   LIQUIDITÄTS-ZEITACHSE (Tab 4)
+   ============================================================ */
+function renderLiquiditaet() {
+  const s   = STATE;
+  const st  = ST;
+  const gre = STEUER_CALC.grunderwerbsteuer(st.kaufpreis, st.inventarAbzug, st.grunderwerbSatz, 0);
+  const nk  = st.kaufpreis * 0.015;
+  const san = CALC.sanNetto(s);
+  const eigenK = s.eigenkapital;
+
+  const phasen = [
+    {
+      titel:'Vor Notartermin', icon:'🔍', zeitraum:'Jetzt – Notartermin',
+      items:[
+        { name:'Bausachverständiger',     val:2500 },
+        { name:'Verkehrswertgutachten',   val:3000 },
+        { name:'Energieberater (iSFP)',   val:800  },
+        { name:'Steuerberater Erstberatung',val:1500 },
+        { name:'Anwalt Kaufvertragsprüfung',val:500 },
+      ]
+    },
+    {
+      titel:'Notartermin', icon:'✍', zeitraum:'Tag X',
+      items:[
+        { name:'Notargebühren (Beurkundung)', val: Math.round(nk * 0.5) },
+      ]
+    },
+    {
+      titel:'4–8 Wochen nach Notar', icon:'💸', zeitraum:'Woche 4–8',
+      items:[
+        { name:`Grunderwerbsteuer (${st.grunderwerbSatz} %)`, val: gre },
+      ]
+    },
+    {
+      titel:'Bis 6 Monate nach Notar', icon:'🏦', zeitraum:'Monat 1–6',
+      items:[
+        { name:'Grundbuchkosten', val: Math.round(nk * 0.5) },
+        { name:'Kaufpreis-Restbetrag (Bank/VD)', val: st.kaufpreis - s.vd_hoehe - s.eigenkapital },
+        { name:'Erste VD-Tilgungsraten (6×)', val: s.vd_tilgung_monatlich * 6 },
+      ].filter(i => i.val > 0)
+    },
+    {
+      titel:'Sanierungsphase (Jahr 1–2)', icon:'🔨', zeitraum:'Monat 6–30',
+      items:[
+        { name:'Sanierungskosten netto (gesamt)', val: Math.round(san) },
+        { name:'– KfW-Kredit abzgl. Zuschuss', val: -Math.round(s.kfw_hoehe * (1 - CALC.kfwTilgungszuschuss(s)/100)) },
+        { name:'– BAFA-Zuschuss', val: -Math.round(CALC.bafaZuschuss(s)) },
+      ]
+    },
+  ];
+
+  const cont = document.getElementById('liquiditaet-timeline');
+  if (!cont) return;
+
+  let laufendeKumul = 0;
+  const kumPhasen = [];
+
+  cont.innerHTML = phasen.map(ph => {
+    const phSumme = ph.items.reduce((a, i) => a + (i.val || 0), 0);
+    laufendeKumul += phSumme;
+    kumPhasen.push(laufendeKumul);
+    const saldo = eigenK - laufendeKumul;
+    const saldoCls = saldo >= 0 ? 'ok' : (saldo >= -20000 ? 'warn' : 'err');
+    return `<div class="liq-phase">
+      <div class="liq-phase-icon">${ph.icon}</div>
+      <div class="liq-phase-body">
+        <div class="liq-phase-titel">
+          <span>${ph.titel} <small style="font-weight:400;color:var(--text-leicht);font-size:11px">(${ph.zeitraum})</small></span>
+          <span class="liq-phase-betrag">${eur(phSumme)}</span>
+        </div>
+        <div class="liq-phase-items">
+          ${ph.items.map(i => `<div class="liq-item"><span class="liq-item-name">${i.name}</span><span class="liq-item-val ${i.val<0?'val-pos':'val-neg'}">${eur(i.val)}</span></div>`).join('')}
+        </div>
+        <div class="liq-kumulativ ${saldoCls}">
+          Kumulativer Bedarf: ${eur(laufendeKumul)} · EK-Saldo: ${eur(saldo)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* Liquiditäts-Chart */
+  if (CHARTS.liquiditaet) {
+    CHARTS.liquiditaet.data = {
+      labels: phasen.map(ph => ph.titel),
+      datasets: [
+        {
+          label: 'Kumulativer Bedarf',
+          data: kumPhasen,
+          backgroundColor: kumPhasen.map(k => k > eigenK ? 'rgba(220,38,38,.7)' : 'rgba(37,99,235,.7)'),
+          borderColor: kumPhasen.map(k => k > eigenK ? 'rgba(220,38,38,1)' : 'rgba(37,99,235,1)'),
+          borderWidth: 1,
+        },
+        {
+          label: 'Verfügbares EK',
+          data: Array(phasen.length).fill(eigenK),
+          type: 'line',
+          borderColor: 'rgba(22,163,74,1)',
+          backgroundColor: 'transparent',
+          borderDash: [5,3], borderWidth: 2, pointRadius: 0,
+        }
+      ]
+    };
+    CHARTS.liquiditaet.update('none');
+  }
+}
+
+/* ============================================================
+   SZENARIEN-VERGLEICH (Tab 5)
+   ============================================================ */
+function renderSzenInputs() {
+  const grid = document.getElementById('szen-inputs-grid');
+  if (!grid) return;
+  grid.innerHTML = ['A','B','C'].map(k => {
+    const sz = SZEN[k];
+    return `<div class="szen-input-karte ${sz.cls}">
+      <h4>${sz.name}</h4>
+      <div class="szen-field"><label>Kaufpreis</label>
+        <input type="number" id="sz_${k}_kp" value="${sz.kaufpreis}" step="5000" onchange="setSzen('${k}','kaufpreis',+this.value)"></div>
+      <div class="szen-field"><label>Verkehrswert (Sanierungsstau)</label>
+        <input type="number" id="sz_${k}_vw" value="${sz.verkehrswert}" step="5000" onchange="setSzen('${k}','verkehrswert',+this.value)"></div>
+      <div class="szen-field"><label>VD-Betrag (€)</label>
+        <input type="number" id="sz_${k}_vd" value="${sz.vdBetrag}" step="10000" onchange="setSzen('${k}','vdBetrag',+this.value)"></div>
+      <div class="szen-field"><label>VD-Zinssatz (%)</label>
+        <input type="number" id="sz_${k}_zins" value="${sz.vdZins}" step="0.1" min="0" max="6" onchange="setSzen('${k}','vdZins',+this.value)"></div>
+      <div class="szen-field"><label>Laufzeit (Jahre)</label>
+        <input type="number" id="sz_${k}_lz" value="${sz.vdLaufzeit}" step="1" min="0" max="40" onchange="setSzen('${k}','vdLaufzeit',+this.value)"></div>
+      <div class="szen-field"><label>Pflichtteilsverzicht?</label>
+        <select onchange="setSzen('${k}','pflichtteilVerzicht',this.value==='true')">
+          <option value="true" ${sz.pflichtteilVerzicht?'selected':''}>Ja – notariell</option>
+          <option value="false" ${!sz.pflichtteilVerzicht?'selected':''}>Nein</option>
+        </select></div>
+      <div class="szen-field"><label>Erlass alle 10 Jahre (€)</label>
+        <input type="number" id="sz_${k}_erl" value="${sz.erlass10Jahre}" step="1000" onchange="setSzen('${k}','erlass10Jahre',+this.value)"></div>
+      <div class="szen-field"><label>Tante stirbt in Jahr</label>
+        <input type="number" id="sz_${k}_sterb" value="${sz.sterbeJahr}" step="1" min="1" max="30" onchange="setSzen('${k}','sterbeJahr',+this.value)"></div>
+    </div>`;
+  }).join('');
+}
+
+function setSzen(key, field, value) {
+  SZEN[key][field] = value;
+  renderSzenVergleich();
+}
+
+function renderSzenVergleich() {
+  renderSzenInputs();
+  const keys = ['A','B','C'];
+  const cols  = ['a-col','b-col','c-col'];
+  const gs    = ST.grunderwerbSatz;
+  const vors  = ST.vorschenkung;
+
+  /* Ergebnisse berechnen */
+  const ergebnisse = keys.map(k => {
+    const sz = SZEN[k];
+    return {
+      ...STEUER_CALC.szenarioSteuergesamt(sz, sz.sterbeJahr, gs, vors),
+      ann: STEUER_CALC.annuitaetMonatlich(sz.vdBetrag, sz.vdZins, sz.vdLaufzeit),
+      sz,
+    };
+  });
+
+  const FREMDMIETEN = 2090;
+
+  const zeilen = [
+    { label:'Kaufpreis',                      fn: (_,r)=>eur(r.sz.kaufpreis),        cls:()=>'' },
+    { label:'Schenkungsanteil (VW−KP)',        fn: (_,r)=>eur(r.schenkungsanteil),    cls:(r)=>r.schenkungsanteil>0?'warn':'' },
+    { label:'Schenkungsteuer Kauf',           fn: (_,r)=>eur(r.stKauf),             cls:(r)=>r.stKauf>0?'schlecht':'' },
+    { label:'Zinsvorteil PV (§15 BewG)',      fn: (_,r)=>eur(r.zinsvor),            cls:(r)=>r.zinsvor>50000?'warn':'' },
+    { label:'Schenkungsteuer Zinsvorteil',    fn: (_,r)=>eur(r.stZins),             cls:(r)=>r.stZins>0?'schlecht':'' },
+    { label:'Grunderwerbsteuer',              fn: (_,r)=>eur(r.gre),                cls:()=>'schlecht' },
+    { label:`Pflichtteilsrisiko (Jahr ${ergebnisse[0].sz.sterbeJahr})`, fn: (_,r)=>eur(r.pflichtteil), cls:(r)=>r.pflichtteil>0?'schlecht':'' },
+    { label:'Erbschaftsteuer Restschuld',     fn: (_,r)=>eur(r.stErb),             cls:(r)=>r.stErb>0?'schlecht':'' },
+    { label:'Restschuld bei Tod',             fn: (_,r)=>eur(r.rsTod),             cls:()=>'' },
+    { label:'Steuerl. GESAMTBELASTUNG 30 J.', fn: (_,r)=>eur(r.gesamt),            cls:(r)=>r.gesamt<40000?'gut':(r.gesamt<100000?'warn':'schlecht'), sum:true },
+    { label:'Monatl. Annuität VD',            fn: (_,r)=>eur(r.ann)+'/Mo.', cls:(r)=>r.ann<FREMDMIETEN?'gut':(r.ann<FREMDMIETEN*1.1?'warn':'schlecht') },
+    { label:'vs. Fremdmieten (2.090 €/Mo.)', fn: (_,r)=>eur(r.ann - FREMDMIETEN)+'/Mo.', cls:(r)=>(r.ann-FREMDMIETEN)<=0?'gut':'schlecht' },
+  ];
+
+  const cont = document.getElementById('szen-vergleich-container');
+  if (!cont) return;
+
+  const headerRow = `<tr>
+    <th>Position</th>
+    ${keys.map((k,i) => `<th style="text-align:right;color:var(--akzent)">${SZEN[k].name}</th>`).join('')}
+  </tr>`;
+
+  const body = zeilen.map(z => {
+    const tds = ergebnisse.map((r, i) => {
+      const cls = (typeof z.cls === 'function' ? z.cls(r) : z.cls) || '';
+      return `<td class="${cols[i]} ${cls}">${z.fn(i, r)}</td>`;
+    }).join('');
+    return `<tr class="${z.sum ? 'summe' : ''}"><th>${z.label}</th>${tds}</tr>`;
+  }).join('');
+
+  cont.innerHTML = `<table class="szen-table"><thead>${headerRow}</thead><tbody>${body}</tbody></table>`;
+
+  /* Charts aktualisieren */
+  updateSzenSteuerChart(ergebnisse);
+  updateSzenCashflowChart();
+}
+
+function updateSzenSteuerChart(ergebnisse) {
+  if (!CHARTS.szenSteuern) return;
+  const labels = ['Schenkungst. Kauf','Schenkungst. Zinsen','Grunderwerbst.','Pflichtteil','Erbschaftst.'];
+  const farben = ['rgba(220,38,38,.8)','rgba(249,115,22,.8)','rgba(217,119,6,.8)','rgba(139,92,246,.8)','rgba(37,99,235,.8)'];
+  CHARTS.szenSteuern.data = {
+    labels: ergebnisse.map(r => r.sz.name),
+    datasets: labels.map((l,i) => ({
+      label: l,
+      data: ergebnisse.map(r => [r.stKauf,r.stZins,r.gre,r.pflichtteil,r.stErb][i]),
+      backgroundColor: farben[i], borderWidth: 1, borderColor: '#fff',
+    }))
+  };
+  CHARTS.szenSteuern.update('none');
+}
+
+function updateSzenCashflowChart() {
+  if (!CHARTS.szenCashflow) return;
+  const keys  = ['A','B','C'];
+  const farben= ['rgba(217,119,6,1)','rgba(37,99,235,1)','rgba(22,163,74,1)'];
+  const labels= Array.from({length:30},(_,i)=>'J.'+(i+1));
+  CHARTS.szenCashflow.data = {
+    labels,
+    datasets: keys.map((k,i) => {
+      const cf = STEUER_CALC.szenarioCashflow(SZEN[k]);
+      return {
+        label: SZEN[k].name,
+        data: cf.map(p => p.cfNetto),
+        borderColor: farben[i], backgroundColor:'transparent',
+        borderWidth: 2, pointRadius:0,
+      };
+    })
+  };
+  CHARTS.szenCashflow.options = { ...CHART_DEFAULTS,
+    plugins:{ ...CHART_DEFAULTS.plugins, tooltip:{ mode:'index', intersect:false } }
+  };
+  CHARTS.szenCashflow.update('none');
+}
+
+/* ============================================================
+   NEUE CHART-INSTANZEN (Tab 2–5)
+   ============================================================ */
+function initNeueCharts() {
+  /* Pflichtteil-Chart */
+  const pfEl = document.getElementById('chart-pflichtteil');
+  if (pfEl) {
+    CHARTS.pflichtteil = new Chart(pfEl, {
+      type: 'line',
+      data: { labels:[], datasets:[] },
+      options: { ...CHART_DEFAULTS,
+        scales:{ ...CHART_DEFAULTS.scales,
+          y:{ ...CHART_DEFAULTS.scales.y, beginAtZero:true } } }
+    });
+  }
+
+  /* Liquiditäts-Chart */
+  const lqEl = document.getElementById('chart-liquiditaet');
+  if (lqEl) {
+    CHARTS.liquiditaet = new Chart(lqEl, {
+      type: 'bar',
+      data: { labels:[], datasets:[] },
+      options: { ...CHART_DEFAULTS,
+        plugins:{ ...CHART_DEFAULTS.plugins, legend:{position:'bottom'} } }
+    });
+  }
+
+  /* Szenarien Steuer-Chart (Stacked Bar) */
+  const szStEl = document.getElementById('chart-szen-steuern');
+  if (szStEl) {
+    CHARTS.szenSteuern = new Chart(szStEl, {
+      type: 'bar',
+      data: { labels:[], datasets:[] },
+      options: { ...CHART_DEFAULTS,
+        scales:{ ...CHART_DEFAULTS.scales,
+          x:{ ...CHART_DEFAULTS.scales.x, stacked:true },
+          y:{ ...CHART_DEFAULTS.scales.y, stacked:true } },
+        plugins:{ ...CHART_DEFAULTS.plugins,
+          legend:{ position:'bottom', labels:{ font:{size:10}, boxWidth:10 } } }
+      }
+    });
+  }
+
+  /* Szenarien Cashflow-Chart */
+  const szCfEl = document.getElementById('chart-szen-cashflow');
+  if (szCfEl) {
+    CHARTS.szenCashflow = new Chart(szCfEl, {
+      type: 'line',
+      data: { labels:[], datasets:[] },
+      options: { ...CHART_DEFAULTS,
+        plugins:{ ...CHART_DEFAULTS.plugins,
+          legend:{ position:'bottom' },
+          tooltip:{ mode:'index', intersect:false } }
+      }
+    });
+  }
+}
+
+/* ============================================================
+   TAB-SWITCHING
+   ============================================================ */
+function bindTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const panel = document.getElementById('tab-' + btn.dataset.tab);
+      if (panel) panel.classList.add('active');
+
+      /* Tab-spezifische Aktualisierungen */
+      const tab = btn.dataset.tab;
+      if (tab === 'steuern')    renderSteuerErgebnis();
+      if (tab === 'risiko')     renderPflichtteilErgebnis();
+      if (tab === 'liquiditaet')renderLiquiditaet();
+      if (tab === 'szenarien')  { renderSzenVergleich(); }
+    });
+  });
+}
+
+/* ============================================================
+   STEUER-TAB-INPUTS BINDEN
+   ============================================================ */
+function bindSteuerInputs() {
+  const pairs = [
+    ['st_kaufpreis','sl_st_kaufpreis','kaufpreis'],
+    ['st_verkehrswert','sl_st_verkehrswert','verkehrswert'],
+    ['st_inventar','sl_st_inventar','inventarAbzug'],
+    ['st_vd_betrag','sl_st_vd_betrag','vdBetrag'],
+    ['st_vd_zins','sl_st_vd_zins','vdZins'],
+    ['st_vd_laufzeit','sl_st_vd_laufzeit','vdLaufzeit'],
+    ['st_markt_zins','sl_st_markt_zins','marktZins'],
+    ['st_vorschenkung','sl_st_vorschenkung','vorschenkung'],
+  ];
+  for (const [numId, slId, stKey] of pairs) {
+    const num = document.getElementById(numId);
+    const sl  = document.getElementById(slId);
+    if (!num || !sl) continue;
+    sl.value = ST[stKey];
+    num.value = ST[stKey];
+    sl.addEventListener('input',  () => { num.value = sl.value;  ST[stKey] = +sl.value;  renderSteuerErgebnis(); });
+    num.addEventListener('change',() => { sl.value  = num.value; ST[stKey] = +num.value; renderSteuerErgebnis(); });
+  }
+  document.getElementById('st_steuerklasse')?.addEventListener('change', e => { ST.steuerklasse = e.target.value; renderSteuerErgebnis(); });
+  document.getElementById('st_grunderwerbland')?.addEventListener('change', e => { ST.grunderwerbSatz = +e.target.value; renderSteuerErgebnis(); });
+
+  /* Risiko-Tab Slider */
+  const risikoSlider = [
+    ['tante_alter','sl_tante_alter','tanteAlter'],
+    ['tanteeh_alter','sl_tanteeh_alter','tanteEhAlter'],
+    ['pflichtteil_quote','sl_pflichtteil_quote','pflichtteilQuote'],
+    ['schenkungsanteil','sl_schenkungsanteil','schenkungsanteil'],
+  ];
+  for (const [numId, slId, stKey] of risikoSlider) {
+    const num = document.getElementById(numId);
+    const sl  = document.getElementById(slId);
+    if (!num || !sl) continue;
+    sl.addEventListener('input',  () => { num.value = sl.value;  ST[stKey] = +sl.value;  renderPflichtteilErgebnis(); });
+    num.addEventListener('change',() => { sl.value  = num.value; ST[stKey] = +num.value; renderPflichtteilErgebnis(); });
+  }
+  document.getElementById('pflichtteil_verzicht')?.addEventListener('change', e => { ST.pflichtteilVerzicht = e.target.checked; renderPflichtteilErgebnis(); });
+  document.getElementById('sterbe_jahr_slider')?.addEventListener('input', () => renderPflichtteilErgebnis());
+}
+
+/* ============================================================
+   TEST-SUITE (Berechnungs-Validierung)
+   ============================================================ */
+function runTests() {
+  const log = [];
+  let ok = 0, fail = 0;
+
+  function test(beschreibung, erwartet, berechnet, toleranz = 0) {
+    const diff = Math.abs(erwartet - berechnet);
+    const bestanden = diff <= Math.max(toleranz, 1);
+    if (bestanden) {
+      log.push(`<span class="test-ok">✓</span> ${beschreibung}: ${fmt.format(berechnet)} € (erwartet ${fmt.format(erwartet)} €)`);
+      ok++;
+    } else {
+      log.push(`<span class="test-fail">✗</span> ${beschreibung}: ${fmt.format(berechnet)} € ≠ ${fmt.format(erwartet)} € (Diff: ${fmt.format(diff)} €)`);
+      fail++;
+    }
+  }
+
+  log.push('<span class="test-info">── ErbStG §19 Steuertests ──────────────────</span>');
+
+  /* Test 1: Schenkungsteuer 100k Klasse II */
+  /* 100k Schenkung, FB=20k → steuerpfl. 80k.
+     80k > 75k Grenze → Flat-Rate 20% = 16.000€.
+     Härteausgleich: 75k×15% + (5k×50%) = 11.250+2.500 = 13.750€ < 16.000 → 13.750€ */
+  test('Schenkungsteuer 100k Klasse II (mit Härteausgleich)',
+    13750, STEUER_CALC.steuer(100000, 'II'), 0);
+
+  /* Test 2: Schenkung 20k → genau Freibetrag → 0€ */
+  test('Schenkungsteuer 20k Klasse II (genau FB)',
+    0, STEUER_CALC.steuer(20000, 'II'), 0);
+
+  /* Test 3: Schenkung 95k → steuerpfl. 75k → Grenzwert erste Stufe */
+  test('Schenkungsteuer 95k Klasse II (steuerpfl. 75k, Grenze exakt)',
+    11250, STEUER_CALC.steuer(95000, 'II'), 0);
+
+  /* Test 4: Schenkung 320k Klasse II → steuerpfl. 300k → 300k × 20% = 60.000€ */
+  test('Schenkungsteuer 320k Klasse II (steuerpfl. 300k)',
+    60000, STEUER_CALC.steuer(320000, 'II'), 0);
+
+  log.push('<span class="test-info">── Annuitäts-Tests ─────────────────────────</span>');
+
+  /* Test 5: Annuität 700k @ 2,5% / 30J. = 2.766 €/Monat */
+  const ann700k = STEUER_CALC.annuitaetMonatlich(700000, 2.5, 30);
+  test('Annuität 700k × 2,5 % × 30 J. (Zielwert 2.766 €/Mo.)',
+    2766, ann700k, 5);
+
+  /* Test 6: Annuität 550k @ 2,5% / 30J. */
+  const ann550k = STEUER_CALC.annuitaetMonatlich(550000, 2.5, 30);
+  test('Annuität 550k × 2,5 % × 30 J. (Zielwert ≈ 2.174 €/Mo.)',
+    Math.round(ann700k * 550/700), ann550k, 10);
+
+  log.push('<span class="test-info">── §2325 BGB Pflichtteil-Tests ─────────────</span>');
+
+  /* Test 7: Pflichtteil 100k Schenkung, Tod nach 5 Jahren, Quote 37,5% */
+  /* Anrechnungsquote = 1 - 5×0,1 = 0,5 → 100k × 0,5 × 0,375 = 18.750€ */
+  test('§2325 BGB: 100k Schenkung, Tod J.5, Quote 37,5%',
+    18750, STEUER_CALC.pflichtteilErgaenzung(100000, 5, 37.5), 0);
+
+  /* Test 8: Tod nach 10 Jahren → 0€ */
+  test('§2325 BGB: 100k Schenkung, Tod J.10 → 0 €',
+    0, STEUER_CALC.pflichtteilErgaenzung(100000, 10, 37.5), 0);
+
+  log.push('<span class="test-info">── GrESt-Tests ─────────────────────────────</span>');
+
+  /* Test 9: GrESt 550k @ 6,5%, kein Schenkungsanteil */
+  test('GrESt 550k × 6,5 % = 35.750 €',
+    35750, STEUER_CALC.grunderwerbsteuer(550000, 0, 6.5, 0), 0);
+
+  /* Test 10: GrESt mit Schenkungsanteil 150k → nur 400k × 6,5% = 26.000€ */
+  test('GrESt 550k, Schenkungsanteil 150k → 400k × 6,5% = 26.000 €',
+    26000, STEUER_CALC.grunderwerbsteuer(550000, 0, 6.5, 150000), 0);
+
+  log.push('<span class="test-info">── §15 BewG Zinsvorteil-Tests ──────────────</span>');
+
+  /* Test 11: Zinsvorteil 550k, Vertragsrate 0%, Markt 3,5%, 30J. */
+  const zv = STEUER_CALC.zinsvorteilPV(550000, 0, 3.5, 30);
+  log.push(`<span class="test-info">ℹ</span> Zinsvorteil PV (550k, 0%→3,5%, 30J.): ${fmt.format(zv)} €`);
+
+  log.push('');
+  const gesamt = ok + fail;
+  const summary = fail === 0
+    ? `<span class="test-ok">✓ Alle ${gesamt} Tests bestanden.</span>`
+    : `<span class="test-fail">✗ ${fail}/${gesamt} Tests fehlgeschlagen.</span>`;
+  log.push(summary);
+
+  document.getElementById('test-console').innerHTML = log.join('\n');
+}
+
+/* ============================================================
    HAUPTFUNKTION: ALLES AKTUALISIEREN
    ============================================================ */
 let waterfallJahr = 1;
@@ -2024,6 +3544,7 @@ function aktualisiere() {
 
   renderKPIs(kn);
   renderFinGap();
+  renderInsights();
   renderPlanTabelle(tl);
 
   updateCashflowChart(tl);
@@ -2034,6 +3555,13 @@ function aktualisiere() {
   updateSensitivitaetChart(sens);
 
   renderSzenarien();
+
+  /* Aktiven Tab mitaktualisieren */
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset?.tab;
+  if (activeTab === 'steuern')     renderSteuerErgebnis();
+  if (activeTab === 'risiko')      renderPflichtteilErgebnis();
+  if (activeTab === 'liquiditaet') renderLiquiditaet();
+  if (activeTab === 'szenarien')   renderSzenVergleich();
 }
 
 /* ============================================================
@@ -2149,8 +3677,14 @@ function init() {
   ladeState();
   renderSidebar();
   initCharts();
+  initNeueCharts();
   bindWaterfall();
+  bindTabs();
+  bindSteuerInputs();
+  renderSzenInputs();
   aktualisiere();
+  /* Szenarien-Tab initial befüllen */
+  renderSzenVergleich();
 }
 
 /* Starten wenn DOM bereit */
